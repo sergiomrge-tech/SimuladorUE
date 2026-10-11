@@ -170,6 +170,15 @@ void AResortGameMode::BuildBeach()
 	SpawnBox(FVector(SeaEdgeX + 15000.f, 0.f, -45.f), FVector(30000.f, 40000.f, 60.f),
 		FLinearColor(0.02f, 0.38f, 0.5f), true, false);
 
+	// Mar em faixas (raso -> fundo) para dar profundidade, e espuma na beira
+	SpawnBox(FVector(SeaEdgeX + 1000.f, 0.f, -13.f), FVector(2000.f, 40000.f, 4.f), FLinearColor(0.15f, 0.7f, 0.7f), true, false);
+	SpawnBox(FVector(SeaEdgeX + 3000.f + 250.f, 0.f, -15.f), FVector(3500.f, 40000.f, 4.f), FLinearColor(0.05f, 0.5f, 0.6f), true, false);
+	SpawnBox(FVector(SeaEdgeX + 40.f, 0.f, -11.f), FVector(80.f, 40000.f, 4.f), FLinearColor(0.95f, 0.98f, 0.98f), true, false);
+
+	// Areia molhada perto da agua e passarela de madeira da entrada ate o quiosque (so visual)
+	SpawnBox(FVector(325.f, 0.f, 1.f), FVector(350.f, 6000.f, 2.f), FLinearColor(0.78f, 0.66f, 0.45f), true, false);
+	SpawnBox(FVector(-1725.f, 0.f, 2.f), FVector(2450.f, 220.f, 4.f), FLinearColor(0.55f, 0.38f, 0.22f), true, false);
+
 	// Paredes invisiveis: limitam a area jogavel (3500 x 6000 cm)
 	const float WallHeight = 600.f;
 	const float WallZ = WallHeight * 0.5f;

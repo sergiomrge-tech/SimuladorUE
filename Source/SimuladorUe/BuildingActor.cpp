@@ -163,17 +163,31 @@ void ABuildingActor::BuildVisuals()
 	}
 	else if (Def.Id == TEXT("palm"))
 	{
-		// Palmeira de enfeite: tronco + folhas caidas
-		Part(TEXT("Cylinder"), FVector(0.f, 0.f, S.Z * 0.5f), FVector(35.f, 35.f, S.Z), FLinearColor(0.35f, 0.24f, 0.14f));
-		const int32 LeafCount = 7;
+		// Palmeira de enfeite: tronco em 3 segmentos inclinados + duas camadas de folhas
+		const float Seg = S.Z / 3.f;
+		for (int32 k = 0; k < 3; ++k)
+		{
+			const float Width = 38.f - 6.f * k;
+			Part(TEXT("Cylinder"), FVector(12.f * k, 0.f, Seg * (k + 0.5f)), FVector(Width, Width, Seg + 4.f),
+				FLinearColor(0.35f - 0.02f * k, 0.24f, 0.14f));
+		}
+		const float CrownX = 28.f;
+		const int32 LeafCount = 9;
 		for (int32 i = 0; i < LeafCount; ++i)
 		{
 			const float Yaw = 360.f * i / LeafCount;
 			const FVector Dir = FRotator(0.f, Yaw, 0.f).Vector();
-			Part(TEXT("Cube"), FVector(Dir.X * 110.f, Dir.Y * 110.f, S.Z - 10.f), FVector(260.f, 40.f, 6.f),
-				FLinearColor(0.08f, 0.4f, 0.1f), false, FRotator(-20.f, Yaw, 0.f));
+			Part(TEXT("Cube"), FVector(CrownX + Dir.X * 115.f, Dir.Y * 115.f, S.Z - 10.f), FVector(270.f, 42.f, 6.f),
+				FLinearColor(0.08f, 0.4f, 0.1f), false, FRotator(-22.f, Yaw, 0.f));
 		}
-		Part(TEXT("Sphere"), FVector(0.f, 0.f, S.Z), FVector(35.f, 35.f, 35.f), FLinearColor(0.3f, 0.2f, 0.1f), false);
+		for (int32 i = 0; i < 5; ++i)
+		{
+			const float Yaw = 360.f * i / 5.f + 20.f;
+			const FVector Dir = FRotator(0.f, Yaw, 0.f).Vector();
+			Part(TEXT("Cube"), FVector(CrownX + Dir.X * 60.f, Dir.Y * 60.f, S.Z + 12.f), FVector(180.f, 30.f, 5.f),
+				FLinearColor(0.2f, 0.52f, 0.14f), false, FRotator(28.f, Yaw, 0.f));
+		}
+		Part(TEXT("Sphere"), FVector(CrownX, 0.f, S.Z - 6.f), FVector(40.f, 40.f, 40.f), FLinearColor(0.3f, 0.2f, 0.1f), false);
 	}
 	else
 	{
@@ -182,6 +196,20 @@ void ABuildingActor::BuildVisuals()
 		Part(TEXT("Cube"), FVector(0.f, 0.f, S.Z + 8.f), FVector(S.X + 60.f, S.Y + 60.f, 16.f), RoofColor, false);
 		const float DoorHeight = static_cast<float>(FMath::Min(210.0, S.Z * 0.75));
 		Part(TEXT("Cube"), FVector(S.X * 0.5f + 1.f, 0.f, DoorHeight * 0.5f), FVector(6.f, 90.f, DoorHeight), DarkColor, false);
+
+		// Quiosque e bar de praia: toldo listrado inclinado na frente e balcao
+		if (Def.Id == TEXT("kiosk") || Def.Id == TEXT("beach_bar"))
+		{
+			const int32 Stripes = 6;
+			const float StripeW = S.Y / Stripes;
+			for (int32 i = 0; i < Stripes; ++i)
+			{
+				const FLinearColor Stripe = (i % 2 == 0) ? FLinearColor(0.95f, 0.95f, 0.92f) : FLinearColor(0.85f, 0.2f, 0.18f);
+				Part(TEXT("Cube"), FVector(S.X * 0.5f + 55.f, -S.Y * 0.5f + StripeW * (i + 0.5f), S.Z - 15.f),
+					FVector(110.f, StripeW, 8.f), Stripe, false, FRotator(-18.f, 0.f, 0.f));
+			}
+			Part(TEXT("Cube"), FVector(S.X * 0.5f + 15.f, 0.f, 55.f), FVector(30.f, S.Y * 0.8f, 110.f), FLinearColor(0.55f, 0.36f, 0.2f));
+		}
 
 		// Predios altos ganham "andares" (faixas escuras) para ler como hotel
 		if (S.Z > 400.f)
