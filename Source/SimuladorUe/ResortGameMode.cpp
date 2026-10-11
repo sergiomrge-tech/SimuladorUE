@@ -2,6 +2,9 @@
 #include "BuildingActor.h"
 #include "GuestCharacter.h"
 #include "StaffCharacter.h"
+#include "ResortAudio.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWaveProcedural.h"
 #include "ResortCharacter.h"
 #include "ResortEconomy.h"
 #include "ResortHUD.h"
@@ -847,6 +850,25 @@ void AResortGameMode::Tick(float DeltaSeconds)
 	Economy->Tick(DeltaSeconds);
 	UpdateWaves(DeltaSeconds);
 	UpdatePlot(true);
+
+	// Som do mar (continuo) e gaivotas de vez em quando
+	AudioTimer -= DeltaSeconds;
+	if (AudioTimer <= 0.f)
+	{
+		AudioTimer = 0.5f;
+		if (SeaWave == nullptr && GetWorld() != nullptr && GetWorld()->GetNetMode() != NM_DedicatedServer)
+		{
+			SeaWave = ResortAudio::CreateSeaAmbience();
+			SeaAudio = UGameplayStatics::SpawnSound2D(this, SeaWave, 0.5f);
+		}
+		ResortAudio::KeepSeaAmbienceFed(SeaWave);
+	}
+	GullTimer -= DeltaSeconds;
+	if (GullTimer <= 0.f)
+	{
+		GullTimer = FMath::FRandRange(14.f, 30.f);
+		ResortAudio::Play(this, EResortSound::Gull, 0.25f);
+	}
 
 	StaffSyncTimer -= DeltaSeconds;
 	if (StaffSyncTimer <= 0.f)

@@ -102,6 +102,12 @@ O jogo já está pronto para receber os modelos; é só apontar para eles em `To
 
 Se o modelo não for achado, o jogo usa o boneco básico e avisa no Output Log.
 
+## Sons
+
+Os sons são gerados por código (`ResortAudio`), sem arquivos: mar contínuo, gaivotas, moedas quando
+um hóspede paga, batida ao construir e um sinal ao comprar melhorias. São provisórios; dá para trocar
+por áudio de verdade depois.
+
 ## Mar e areia
 
 O mar tem ondas (cristas que viajam até a praia, espuma que avança e recua, areia molhada que

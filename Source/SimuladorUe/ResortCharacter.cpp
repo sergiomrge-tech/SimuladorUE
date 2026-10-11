@@ -1,6 +1,7 @@
 #include "ResortCharacter.h"
 #include "BuildingActor.h"
 #include "ResortEconomy.h"
+#include "ResortAudio.h"
 #include "ResortGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -354,6 +355,7 @@ void AResortCharacter::HireAttendant()
 		return;
 	}
 	Building->SetAttendants(Building->GetAttendants() + 1);
+	ResortAudio::Play(this, EResortSound::Upgrade, 0.5f);
 	Economy->PushNotification(
 		FString::Printf(TEXT("Atendente contratado em %s (-R$ %d, salário R$ 15/dia)"), *Building->GetDef().DisplayName, Cost),
 		FLinearColor(0.7f, 0.9f, 1.f));
@@ -374,6 +376,7 @@ void AResortCharacter::BuyRegister()
 		return;
 	}
 	Building->InstallRegister();
+	ResortAudio::Play(this, EResortSound::Upgrade, 0.5f);
 	Economy->PushNotification(
 		FString::Printf(TEXT("Caixa instalado em %s: atendimento 30%% mais rápido (-R$ %d)"), *Building->GetDef().DisplayName, Cost),
 		FLinearColor(1.f, 0.85f, 0.3f));
@@ -428,6 +431,7 @@ void AResortCharacter::RenovateRoom()
 		return;
 	}
 	const int32 Index = Building->RenovateNextRoom();
+	ResortAudio::Play(this, EResortSound::Upgrade, 0.5f);
 	Economy->PushNotification(
 		FString::Printf(TEXT("Quarto %d reformado para o nível %d (-R$ %d)"), Index + 1, Building->GetRoomLevel(Index), Cost),
 		FLinearColor(1.f, 0.85f, 0.3f));
@@ -492,6 +496,7 @@ void AResortCharacter::BuyUpgradeSlot(int32 Slot)
 		return;
 	}
 	Building->ApplyUpgrade(U);
+	ResortAudio::Play(this, EResortSound::Upgrade, 0.5f);
 	Economy->PushNotification(
 		FString::Printf(TEXT("%s: %s instalado (-R$ %d)"), *Building->GetDef().DisplayName, *U.Name, Cost),
 		FLinearColor(1.f, 0.85f, 0.3f));
@@ -615,6 +620,7 @@ void AResortCharacter::PlaceBuilding()
 	}
 
 	Building->InitFromDef(*Def, EBuildingMode::Placed);
+	ResortAudio::Play(this, EResortSound::Build, 0.5f);
 	Economy->PushNotification(
 		FString::Printf(TEXT("%s construído (-R$ %d)"), *Def->DisplayName, Def->Cost),
 		FLinearColor(0.7f, 0.9f, 1.f));

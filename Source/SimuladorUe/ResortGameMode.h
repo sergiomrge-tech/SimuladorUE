@@ -9,6 +9,8 @@ class APlayerStart;
 class UDirectionalLightComponent;
 class UResortEconomy;
 class AStaffCharacter;
+class USoundWaveProcedural;
+class UAudioComponent;
 
 /**
  * Regras da partida. Como o prototipo nao usa assets de mapa, este GameMode
@@ -87,6 +89,13 @@ private:
 	TWeakObjectPtr<AStaticMeshActor> FenceLeft;
 	TWeakObjectPtr<AStaticMeshActor> FenceRight;
 	int32 PlotTier = 0;
+
+	UPROPERTY()
+	TObjectPtr<USoundWaveProcedural> SeaWave;
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> SeaAudio;
+	float AudioTimer = 0.f;
+	float GullTimer = 8.f;
 
 	bool bWorldBuilt = false;
 	int32 LastAutosaveDay = 1;

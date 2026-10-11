@@ -1,5 +1,6 @@
 #include "GuestCharacter.h"
 #include "ResortEconomy.h"
+#include "ResortAudio.h"
 #include "ResortGameMode.h"
 #include "ResortVisuals.h"
 #include "Components/CapsuleComponent.h"
@@ -338,6 +339,10 @@ void AGuestCharacter::FinishUsing()
 		VisitedIds.Add(D.Id);
 		Building->Release(RoomIndex);
 		RoomIndex = -1;
+		if (Pay > 0.f)
+		{
+			ResortAudio::Play(this, EResortSound::Coin, 0.12f);
+		}
 
 		if (Pay >= 100.f)
 		{
