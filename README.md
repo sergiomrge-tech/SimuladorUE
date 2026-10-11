@@ -50,6 +50,9 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
   uma parte do valor da construção, aumenta a renda (nos quartos, a diária), a satisfação e a
   manutenção. Uma esfera dourada no telhado marca cada melhoria. Os dados ficam em
   `Content/Data/Upgrades.json`.
+- **Quiosque e comida:** vende água de coco de base; melhorias adicionam bebidas, lanches, petiscos e
+  drinks ao cardápio. Com a mira no quiosque, **5** contrata atendente (mais clientes ao mesmo tempo;
+  o primeiro é o dono, de graça) e **6** instala o caixa registradora (atendimento 30% mais rápido).
 - **Equipe:** garçons (+6% de renda em comida, hospedagem e spa) e faxineiros (+satisfação por visita),
   até 5 de cada, com salário diário.
 - **Estrelas:** cada melhoria sobe a construção em 1 estrela (até 5); hóspedes ricos preferem as de mais estrelas.

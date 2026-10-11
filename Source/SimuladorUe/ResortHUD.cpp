@@ -137,7 +137,7 @@ void AResortHUD::DrawHUD()
 		const float PanelW = 470.f * S;
 		const float PanelX = W - PanelW - 20.f * S;
 		const float RowH = 26.f * S;
-		const float PanelH = 150.f * S + RowH * Ups.Num();
+		const float PanelH = 180.f * S + RowH * (Ups.Num() + 3);
 		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.55f), PanelX, 20.f * S, PanelW, PanelH);
 
 		DrawText(BD.DisplayName, Gold, PanelX + 16.f * S, 28.f * S, Medium, 1.0f * S);
@@ -148,10 +148,23 @@ void AResortHUD::DrawHUD()
 			FMath::RoundToInt(B->GetIncome()), FMath::RoundToInt(B->GetUpkeep())),
 			Green, PanelX + 16.f * S, 58.f * S, Small, 1.0f * S);
 		DrawText(FString::Printf(TEXT("Investido em melhorias: R$ %d   Ocupação: %d/%d"),
-			B->GetInvested(), B->GetOccupants(), BD.Capacity),
+			B->GetInvested(), B->GetOccupants(), B->GetCapacity()),
 			Dim, PanelX + 16.f * S, 82.f * S, Small, 0.95f * S);
 
 		float Y = 112.f * S;
+		if (B->IsFoodShop())
+		{
+			FString Menu = TEXT("Vende: água de coco");
+			for (const FString& UId : B->GetUpgradeIds())
+			{
+				if (const FUpgradeDef* UD = Economy->FindUpgradeDef(UId))
+				{
+					Menu += TEXT(", ") + UD->Name.ToLower();
+				}
+			}
+			DrawText(Menu, Dim, PanelX + 16.f * S, Y, Small, 0.9f * S);
+			Y += RowH;
+		}
 		for (int32 i = 0; i < Ups.Num(); ++i)
 		{
 			const FUpgradeDef& U = *Ups[i];
@@ -163,6 +176,19 @@ void AResortHUD::DrawHUD()
 				C, PanelX + 16.f * S, Y, Small, 1.0f * S);
 			DrawText(bOwned ? FString(TEXT("instalado")) : FString::Printf(TEXT("R$ %d"), Cost),
 				C, PanelX + PanelW - 120.f * S, Y, Small, 1.0f * S);
+			Y += RowH;
+		}
+		if (B->IsFoodShop())
+		{
+			const bool bCanHire = B->CanHireAttendant();
+			DrawText(FString::Printf(TEXT("[5] Atendente (%d/%d)"), B->GetAttendants(), B->GetDef().Capacity),
+				bCanHire ? White : Dim, PanelX + 16.f * S, Y, Small, 1.0f * S);
+			DrawText(bCanHire ? FString::Printf(TEXT("R$ %d"), B->GetAttendantCost()) : FString(TEXT("completo")),
+				bCanHire ? White : Dim, PanelX + PanelW - 120.f * S, Y, Small, 1.0f * S);
+			Y += RowH;
+			DrawText(TEXT("[6] Caixa registradora (-30% tempo)"), B->HasRegister() ? Green : White, PanelX + 16.f * S, Y, Small, 1.0f * S);
+			DrawText(B->HasRegister() ? FString(TEXT("instalado")) : FString::Printf(TEXT("R$ %d"), B->GetRegisterCost()),
+				B->HasRegister() ? Green : White, PanelX + PanelW - 120.f * S, Y, Small, 1.0f * S);
 			Y += RowH;
 		}
 		if (Ups.Num() > 0)

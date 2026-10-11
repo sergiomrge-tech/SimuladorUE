@@ -39,9 +39,11 @@ MESH_OVERRIDES = {}
 UPGRADES = [
     # id, nome, categoria, construcao (ou "" para toda a categoria), custo (x custo da
     # construcao), bonus de renda, bonus de satisfacao, aumento de manutencao (fracao)
-    ("menu", "Cardápio Premium", "food", "", 0.20, 0.25, 0.02, 0.08),
-    ("kitchen", "Cozinha Equipada", "food", "", 0.35, 0.30, 0.03, 0.12),
-    ("decor_food", "Mobiliário Elegante", "food", "", 0.25, 0.15, 0.06, 0.06),
+    # Comida: cada melhoria e um item novo no cardapio (agua de coco ja vem de base)
+    ("bebidas", "Bebidas e Sucos", "food", "", 0.15, 0.25, 0.02, 0.05),
+    ("lanches", "Lanches", "food", "", 0.25, 0.35, 0.03, 0.08),
+    ("petiscos", "Petiscos e Porções", "food", "", 0.30, 0.40, 0.03, 0.10),
+    ("drinks", "Drinks e Caipirinhas", "food", "", 0.40, 0.45, 0.02, 0.12),
     ("cushions", "Almofadas e Toalhas", "shade", "", 0.50, 0.20, 0.05, 0.10),
     ("cooler", "Frigobar Portátil", "shade", "", 0.80, 0.30, 0.03, 0.15),
     ("equipment", "Equipamentos Novos", "entertainment", "", 0.30, 0.20, 0.05, 0.08),

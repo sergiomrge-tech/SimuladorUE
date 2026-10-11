@@ -308,7 +308,7 @@ void AGuestCharacter::StartLeaving()
 void AGuestCharacter::BeginUsing(ABuildingActor* Building)
 {
 	State = EGuestState::Using;
-	Timer = Building->GetDef().ServiceSeconds;
+	Timer = Building->GetServiceSeconds();
 	if (Building->GetDef().IsEnclosed())
 	{
 		SetActorHiddenInGame(true); // "entrou" na construcao

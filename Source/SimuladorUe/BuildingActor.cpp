@@ -36,6 +36,10 @@ void ABuildingActor::InitFromDef(const FBuildingDef& InDef, EBuildingMode InMode
 
 	if (Mode == EBuildingMode::Placed)
 	{
+		if (IsFoodShop())
+		{
+			SetAttendants(1); // o dono atende de graca no comeco
+		}
 		if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
 		{
 			Economy->RegisterBuilding(this);
@@ -73,7 +77,7 @@ void ABuildingActor::SetGhostValid(bool bValid)
 
 bool ABuildingActor::TryReserve()
 {
-	if (Occupants >= Def.Capacity)
+	if (Occupants >= GetCapacity())
 	{
 		return false;
 	}
@@ -84,6 +88,35 @@ bool ABuildingActor::TryReserve()
 void ABuildingActor::Release()
 {
 	Occupants = FMath::Max(0, Occupants - 1);
+}
+
+void ABuildingActor::SetAttendants(int32 Count)
+{
+	Attendants = FMath::Clamp(Count, 0, Def.Capacity);
+	// Bonecos ao lado da construcao, em fila
+	const FLinearColor Shirts[3] = { FLinearColor(0.95f, 0.95f, 0.95f), FLinearColor(0.9f, 0.3f, 0.2f), FLinearColor(0.2f, 0.5f, 0.9f) };
+	while (AttendantsShown < Attendants)
+	{
+		const int32 k = AttendantsShown;
+		const float X = -Def.Size.X * 0.3f + 55.f * k;
+		const float Y = Def.Size.Y * 0.5f + 45.f;
+		Part(TEXT("Cylinder"), FVector(X, Y, 45.f), FVector(28.f, 22.f, 90.f), FLinearColor(0.15f, 0.2f, 0.35f), false);
+		Part(TEXT("Cylinder"), FVector(X, Y, 118.f), FVector(34.f, 26.f, 56.f), Shirts[k % 3], false);
+		Part(TEXT("Sphere"), FVector(X, Y, 160.f), FVector(24.f, 24.f, 26.f), FLinearColor(0.85f, 0.65f, 0.5f), false);
+		++AttendantsShown;
+	}
+}
+
+void ABuildingActor::InstallRegister()
+{
+	if (bRegister)
+	{
+		return;
+	}
+	bRegister = true;
+	const float X = Def.Size.X * 0.5f + 15.f;
+	Part(TEXT("Cube"), FVector(X, Def.Size.Y * 0.25f, 120.f), FVector(26.f, 40.f, 22.f), FLinearColor(0.12f, 0.12f, 0.14f), false);
+	Part(TEXT("Cube"), FVector(X - 4.f, Def.Size.Y * 0.25f, 138.f), FVector(4.f, 30.f, 16.f), FLinearColor(0.2f, 0.9f, 0.4f), false, FRotator(-20.f, 0.f, 0.f));
 }
 
 float ABuildingActor::GetIncome() const

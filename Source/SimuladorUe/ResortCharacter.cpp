@@ -63,6 +63,8 @@ void AResortCharacter::EnsureInput()
 	SaveAction = MakeAction(TEXT("IA_Save"), EInputActionValueType::Boolean);
 	LoadAction = MakeAction(TEXT("IA_Load"), EInputActionValueType::Boolean);
 	NewGameAction = MakeAction(TEXT("IA_NewGame"), EInputActionValueType::Boolean);
+	HireAttendantAction = MakeAction(TEXT("IA_HireAttendant"), EInputActionValueType::Boolean);
+	RegisterAction = MakeAction(TEXT("IA_Register"), EInputActionValueType::Boolean);
 	HireWaiterAction = MakeAction(TEXT("IA_HireWaiter"), EInputActionValueType::Boolean);
 	HireCleanerAction = MakeAction(TEXT("IA_HireCleaner"), EInputActionValueType::Boolean);
 	PauseAction = MakeAction(TEXT("IA_Pause"), EInputActionValueType::Boolean);
@@ -117,6 +119,8 @@ void AResortCharacter::EnsureInput()
 	InputContext->MapKey(SaveAction, EKeys::F5);
 	InputContext->MapKey(LoadAction, EKeys::F9);
 	InputContext->MapKey(NewGameAction, EKeys::F7);
+	InputContext->MapKey(HireAttendantAction, EKeys::Five);
+	InputContext->MapKey(RegisterAction, EKeys::Six);
 	InputContext->MapKey(HireWaiterAction, EKeys::F2);
 	InputContext->MapKey(HireCleanerAction, EKeys::F3);
 	InputContext->MapKey(PauseAction, EKeys::P);
@@ -155,6 +159,8 @@ void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(SaveAction, ETriggerEvent::Started, this, &AResortCharacter::SaveKey);
 	Input->BindAction(LoadAction, ETriggerEvent::Started, this, &AResortCharacter::LoadKey);
 	Input->BindAction(NewGameAction, ETriggerEvent::Started, this, &AResortCharacter::NewGameKey);
+	Input->BindAction(HireAttendantAction, ETriggerEvent::Started, this, &AResortCharacter::HireAttendant);
+	Input->BindAction(RegisterAction, ETriggerEvent::Started, this, &AResortCharacter::BuyRegister);
 	Input->BindAction(HireWaiterAction, ETriggerEvent::Started, this, &AResortCharacter::HireWaiter);
 	Input->BindAction(HireCleanerAction, ETriggerEvent::Started, this, &AResortCharacter::HireCleaner);
 	Input->BindAction(PauseAction, ETriggerEvent::Started, this, &AResortCharacter::TogglePause);
@@ -310,6 +316,46 @@ void AResortCharacter::UpdateFocus()
 			FocusedBuilding = Building;
 		}
 	}
+}
+
+void AResortCharacter::HireAttendant()
+{
+	UResortEconomy* Economy = AResortGameMode::GetEconomy(this);
+	ABuildingActor* Building = FocusedBuilding.Get();
+	if (bBuildMode || Economy == nullptr || Building == nullptr || !Building->CanHireAttendant())
+	{
+		return;
+	}
+	const int32 Cost = Building->GetAttendantCost();
+	if (!Economy->TrySpend(static_cast<float>(Cost)))
+	{
+		Economy->PushNotification(TEXT("Dinheiro insuficiente para contratar."), FLinearColor(1.f, 0.5f, 0.4f));
+		return;
+	}
+	Building->SetAttendants(Building->GetAttendants() + 1);
+	Economy->PushNotification(
+		FString::Printf(TEXT("Atendente contratado em %s (-R$ %d, salário R$ 15/dia)"), *Building->GetDef().DisplayName, Cost),
+		FLinearColor(0.7f, 0.9f, 1.f));
+}
+
+void AResortCharacter::BuyRegister()
+{
+	UResortEconomy* Economy = AResortGameMode::GetEconomy(this);
+	ABuildingActor* Building = FocusedBuilding.Get();
+	if (bBuildMode || Economy == nullptr || Building == nullptr || !Building->IsFoodShop() || Building->HasRegister())
+	{
+		return;
+	}
+	const int32 Cost = Building->GetRegisterCost();
+	if (!Economy->TrySpend(static_cast<float>(Cost)))
+	{
+		Economy->PushNotification(TEXT("Dinheiro insuficiente para o caixa."), FLinearColor(1.f, 0.5f, 0.4f));
+		return;
+	}
+	Building->InstallRegister();
+	Economy->PushNotification(
+		FString::Printf(TEXT("Caixa instalado em %s: atendimento 30%% mais rápido (-R$ %d)"), *Building->GetDef().DisplayName, Cost),
+		FLinearColor(1.f, 0.85f, 0.3f));
 }
 
 void AResortCharacter::HireWaiter()

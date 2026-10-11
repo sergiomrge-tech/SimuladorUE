@@ -156,6 +156,8 @@ void AResortGameMode::SaveResort(bool bQuiet)
 			Ups.Add(MakeShared<FJsonValueString>(UId));
 		}
 		B->SetArrayField(TEXT("Upgrades"), Ups);
+		B->SetNumberField(TEXT("Attendants"), P->GetAttendants());
+		B->SetBoolField(TEXT("Register"), P->HasRegister());
 		List.Add(MakeShared<FJsonValueObject>(B));
 	}
 
@@ -263,6 +265,18 @@ bool AResortGameMode::LoadResort(bool bQuiet)
 			if (B != nullptr)
 			{
 				B->InitFromDef(*Def, EBuildingMode::Placed);
+				double Att = 1.0;
+				bool bReg = false;
+				O->TryGetNumberField(TEXT("Attendants"), Att);
+				O->TryGetBoolField(TEXT("Register"), bReg);
+				if (B->IsFoodShop())
+				{
+					B->SetAttendants(static_cast<int32>(Att));
+					if (bReg)
+					{
+						B->InstallRegister();
+					}
+				}
 				const TArray<TSharedPtr<FJsonValue>>* Ups = nullptr;
 				if (O->TryGetArrayField(TEXT("Upgrades"), Ups) && Ups != nullptr)
 				{

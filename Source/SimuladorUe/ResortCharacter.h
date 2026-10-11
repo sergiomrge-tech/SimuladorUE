@@ -60,6 +60,8 @@ private:
 	void LoadKey();
 	void NewGameKey();
 	void BuyUpgradeSlot(int32 Slot);
+	void HireAttendant();
+	void BuyRegister();
 	void HireWaiter();
 	void HireCleaner();
 	void TogglePause();
@@ -103,6 +105,10 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> UpgradeActions;
+	UPROPERTY()
+	TObjectPtr<UInputAction> HireAttendantAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> RegisterAction;
 	UPROPERTY()
 	TObjectPtr<UInputAction> HireWaiterAction;
 	UPROPERTY()

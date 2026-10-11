@@ -1,31 +1,40 @@
 {
   "Upgrades": [
     {
-      "Id": "menu",
-      "Name": "Card\u00e1pio Premium",
+      "Id": "bebidas",
+      "Name": "Bebidas e Sucos",
       "Category": "food",
-      "CostFactor": 0.2,
+      "CostFactor": 0.15,
       "IncomeBonus": 0.25,
       "SatisfactionBonus": 0.02,
+      "UpkeepFactor": 0.05
+    },
+    {
+      "Id": "lanches",
+      "Name": "Lanches",
+      "Category": "food",
+      "CostFactor": 0.25,
+      "IncomeBonus": 0.35,
+      "SatisfactionBonus": 0.03,
       "UpkeepFactor": 0.08
     },
     {
-      "Id": "kitchen",
-      "Name": "Cozinha Equipada",
+      "Id": "petiscos",
+      "Name": "Petiscos e Por\u00e7\u00f5es",
       "Category": "food",
-      "CostFactor": 0.35,
-      "IncomeBonus": 0.3,
+      "CostFactor": 0.3,
+      "IncomeBonus": 0.4,
       "SatisfactionBonus": 0.03,
-      "UpkeepFactor": 0.12
+      "UpkeepFactor": 0.1
     },
     {
-      "Id": "decor_food",
-      "Name": "Mobili\u00e1rio Elegante",
+      "Id": "drinks",
+      "Name": "Drinks e Caipirinhas",
       "Category": "food",
-      "CostFactor": 0.25,
-      "IncomeBonus": 0.15,
-      "SatisfactionBonus": 0.06,
-      "UpkeepFactor": 0.06
+      "CostFactor": 0.4,
+      "IncomeBonus": 0.45,
+      "SatisfactionBonus": 0.02,
+      "UpkeepFactor": 0.12
     },
     {
       "Id": "cushions",
