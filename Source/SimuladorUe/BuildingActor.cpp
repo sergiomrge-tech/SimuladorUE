@@ -86,6 +86,24 @@ void ABuildingActor::Release()
 	Occupants = FMath::Max(0, Occupants - 1);
 }
 
+bool ABuildingActor::ApplyUpgrade(const FUpgradeDef& Upgrade)
+{
+	if (UpgradeIds.Contains(Upgrade.Id))
+	{
+		return false;
+	}
+	UpgradeIds.Add(Upgrade.Id);
+	IncomeBonus += Upgrade.IncomeBonus;
+	SatisfactionBonus += Upgrade.SatisfactionBonus;
+	UpkeepBonus += Upgrade.UpkeepFactor;
+	Invested += Upgrade.CostFor(Def);
+
+	// Marca visual: uma esfera dourada por melhoria, sobre o telhado
+	const float Y = (UpgradeIds.Num() - 2.5f) * 36.f;
+	Part(TEXT("Sphere"), FVector(0.f, Y, Def.Size.Z + 45.f), FVector(22.f, 22.f, 22.f), FLinearColor(1.f, 0.8f, 0.2f), false);
+	return true;
+}
+
 FVector ABuildingActor::GetFootprintHalf() const
 {
 	return FVector(Def.Size.X * 0.5f + 20.f, Def.Size.Y * 0.5f + 20.f, Def.Size.Z * 0.5f + 15.f);

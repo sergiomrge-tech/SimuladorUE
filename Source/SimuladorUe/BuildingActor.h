@@ -42,6 +42,18 @@ public:
 	void Release();
 	int32 GetOccupants() const { return Occupants; }
 
+	// ---- Melhorias (cama, armario, cardapio...) ----
+	bool HasUpgrade(const FString& UpgradeId) const { return UpgradeIds.Contains(UpgradeId); }
+	const TArray<FString>& GetUpgradeIds() const { return UpgradeIds; }
+	/** Aplica a melhoria (sem cobrar). Retorna false se ja tinha. */
+	bool ApplyUpgrade(const FUpgradeDef& Upgrade);
+	/** Renda por visita ja com as melhorias (para quartos, a diaria). */
+	float GetIncome() const { return Def.IncomePerVisit * (1.f + IncomeBonus); }
+	float GetSatisfaction() const { return Def.Satisfaction + SatisfactionBonus; }
+	float GetUpkeep() const { return Def.UpkeepPerDay * (1.f + UpkeepBonus); }
+	/** Total gasto em melhorias nesta construcao. */
+	int32 GetInvested() const { return Invested; }
+
 	/** Metade do tamanho ocupado no chao (inclui uma folga de beiral). */
 	FVector GetFootprintHalf() const;
 
@@ -55,6 +67,11 @@ private:
 	FBuildingDef Def;
 	EBuildingMode Mode = EBuildingMode::Placed;
 	int32 Occupants = 0;
+	TArray<FString> UpgradeIds;
+	float IncomeBonus = 0.f;
+	float SatisfactionBonus = 0.f;
+	float UpkeepBonus = 0.f;
+	int32 Invested = 0;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UStaticMeshComponent>> Parts;

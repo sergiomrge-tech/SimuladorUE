@@ -124,6 +124,48 @@ void AResortHUD::DrawHUD()
 		}
 	}
 
+	// ------------------------------------------------ Gerenciamento da construcao sob a mira
+	if (Player != nullptr && !Player->IsBuildMode() && Player->GetFocusedBuilding() != nullptr)
+	{
+		const ABuildingActor* B = Player->GetFocusedBuilding();
+		const FBuildingDef& BD = B->GetDef();
+		const TArray<const FUpgradeDef*> Ups = Economy->GetUpgradesFor(BD);
+		const float PanelW = 470.f * S;
+		const float PanelX = W - PanelW - 20.f * S;
+		const float RowH = 26.f * S;
+		const float PanelH = 150.f * S + RowH * Ups.Num();
+		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.55f), PanelX, 20.f * S, PanelW, PanelH);
+
+		DrawText(BD.DisplayName, Gold, PanelX + 16.f * S, 28.f * S, Medium, 1.0f * S);
+		const bool bLodging = BD.Category == TEXT("lodging");
+		DrawText(FString::Printf(TEXT("%s: R$ %d   Manutenção: R$ %d/dia"),
+			bLodging ? TEXT("Diária") : TEXT("Renda por visita"),
+			FMath::RoundToInt(B->GetIncome()), FMath::RoundToInt(B->GetUpkeep())),
+			Green, PanelX + 16.f * S, 58.f * S, Small, 1.0f * S);
+		DrawText(FString::Printf(TEXT("Investido em melhorias: R$ %d   Ocupação: %d/%d"),
+			B->GetInvested(), B->GetOccupants(), BD.Capacity),
+			Dim, PanelX + 16.f * S, 82.f * S, Small, 0.95f * S);
+
+		float Y = 112.f * S;
+		for (int32 i = 0; i < Ups.Num(); ++i)
+		{
+			const FUpgradeDef& U = *Ups[i];
+			const bool bOwned = B->HasUpgrade(U.Id);
+			const int32 Cost = U.CostFor(BD);
+			const bool bAfford = Economy->CanAfford(static_cast<float>(Cost));
+			const FLinearColor C = bOwned ? Green : (bAfford ? White : FLinearColor(1.f, 0.5f, 0.45f));
+			DrawText(FString::Printf(TEXT("[%d] %s  +%d%% renda"), i + 1, *U.Name, FMath::RoundToInt(U.IncomeBonus * 100.f)),
+				C, PanelX + 16.f * S, Y, Small, 1.0f * S);
+			DrawText(bOwned ? FString(TEXT("instalado")) : FString::Printf(TEXT("R$ %d"), Cost),
+				C, PanelX + PanelW - 120.f * S, Y, Small, 1.0f * S);
+			Y += RowH;
+		}
+		if (Ups.Num() > 0)
+		{
+			DrawText(TEXT("Aperte o número para comprar a melhoria"), Dim, PanelX + 16.f * S, Y + 8.f * S, Small, 0.9f * S);
+		}
+	}
+
 	// ------------------------------------------------ Avisos
 	{
 		float Y = H - 60.f * S;

@@ -36,6 +36,25 @@ BUILDINGS = [
 # Se o modelo nao for achado, o jogo usa as formas basicas.
 MESH_OVERRIDES = {}
 
+UPGRADES = [
+    # id, nome, categoria, construcao (ou "" para toda a categoria), custo (x custo da
+    # construcao), bonus de renda, bonus de satisfacao, aumento de manutencao (fracao)
+    ("menu", "Cardápio Premium", "food", "", 0.20, 0.25, 0.02, 0.08),
+    ("kitchen", "Cozinha Equipada", "food", "", 0.35, 0.30, 0.03, 0.12),
+    ("decor_food", "Mobiliário Elegante", "food", "", 0.25, 0.15, 0.06, 0.06),
+    ("cushions", "Almofadas e Toalhas", "shade", "", 0.50, 0.20, 0.05, 0.10),
+    ("cooler", "Frigobar Portátil", "shade", "", 0.80, 0.30, 0.03, 0.15),
+    ("equipment", "Equipamentos Novos", "entertainment", "", 0.30, 0.20, 0.05, 0.08),
+    ("lights", "Iluminação e Som", "entertainment", "", 0.25, 0.15, 0.04, 0.06),
+    ("bed", "Cama Premium", "lodging", "", 0.30, 0.30, 0.05, 0.06),
+    ("wardrobe", "Armário Embutido", "lodging", "", 0.18, 0.12, 0.03, 0.04),
+    ("minibar", "Frigobar e Cafeteira", "lodging", "", 0.22, 0.20, 0.03, 0.08),
+    ("tv", "TV e Wi-Fi", "lodging", "", 0.15, 0.15, 0.04, 0.05),
+    ("massage", "Massagem Premium", "wellness", "", 0.35, 0.25, 0.04, 0.10),
+    ("aroma", "Aromaterapia", "wellness", "", 0.20, 0.12, 0.06, 0.05),
+    ("sauna", "Sauna", "wellness", "", 0.45, 0.30, 0.03, 0.15),
+]
+
 GUESTS = [
     # id, nome, nivel minimo, orcamento min, max, velocidade, visitas min, max, peso,
     # categoria preferida, cor da camisa
@@ -84,6 +103,16 @@ def main():
             "PreferredCategory": pref,
             "ShirtColor": list(shirt),
         })
+
+    upgrades = []
+    for (uid, name, cat, bid, cf, inc, sat, upk) in UPGRADES:
+        u = {"Id": uid, "Name": name, "Category": cat, "CostFactor": cf,
+             "IncomeBonus": inc, "SatisfactionBonus": sat, "UpkeepFactor": upk}
+        if bid:
+            u["BuildingId"] = bid
+        upgrades.append(u)
+    (out_dir / "Upgrades.json").write_text(
+        json.dumps({"Upgrades": upgrades}, indent=2) + "\n", encoding="utf-8")
 
     # ensure_ascii=True (padrao): acentos viram \uXXXX
     (out_dir / "Buildings.json").write_text(

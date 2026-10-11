@@ -250,7 +250,7 @@ void AGuestCharacter::PickNextTarget()
 			continue;
 		}
 		const FBuildingDef& D = Building->GetDef();
-		if (D.IncomePerVisit > Budget + 0.01f)
+		if (Building->GetIncome() > Budget + 0.01f)
 		{
 			continue; // nao pode pagar
 		}
@@ -323,10 +323,10 @@ void AGuestCharacter::FinishUsing()
 	if (Building != nullptr && Economy != nullptr)
 	{
 		const FBuildingDef& D = Building->GetDef();
-		const float Pay = FMath::Min(D.IncomePerVisit, Budget);
+		const float Pay = FMath::Min(Building->GetIncome(), Budget);
 		Budget -= Pay;
 		Economy->AddMoney(Pay);
-		Satisfaction = FMath::Min(1.5f, Satisfaction + D.Satisfaction);
+		Satisfaction = FMath::Min(1.5f, Satisfaction + Building->GetSatisfaction());
 		VisitedIds.Add(D.Id);
 		Building->Release();
 

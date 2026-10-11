@@ -204,3 +204,35 @@ void ResortData::LoadGuests(TArray<FGuestDef>& Out)
 		Out.Add(Tourist);
 	}
 }
+
+void ResortData::LoadUpgrades(TArray<FUpgradeDef>& Out)
+{
+	Out.Reset();
+	TArray<TSharedPtr<FJsonValue>> Items;
+	if (!LoadJsonArray(TEXT("Upgrades.json"), TEXT("Upgrades"), Items))
+	{
+		return;
+	}
+	for (const TSharedPtr<FJsonValue>& Item : Items)
+	{
+		const TSharedPtr<FJsonObject> Obj = Item.IsValid() ? Item->AsObject() : nullptr;
+		if (!Obj.IsValid())
+		{
+			continue;
+		}
+		FUpgradeDef U;
+		U.Id = GetString(Obj, TEXT("Id"), TEXT(""));
+		if (U.Id.IsEmpty())
+		{
+			continue;
+		}
+		U.Name = GetString(Obj, TEXT("Name"), U.Id);
+		U.Category = GetString(Obj, TEXT("Category"), TEXT(""));
+		U.BuildingId = GetString(Obj, TEXT("BuildingId"), TEXT(""));
+		U.CostFactor = GetNumber(Obj, TEXT("CostFactor"), 0.25f);
+		U.IncomeBonus = GetNumber(Obj, TEXT("IncomeBonus"), 0.15f);
+		U.SatisfactionBonus = GetNumber(Obj, TEXT("SatisfactionBonus"), 0.02f);
+		U.UpkeepFactor = GetNumber(Obj, TEXT("UpkeepFactor"), 0.1f);
+		Out.Add(U);
+	}
+}

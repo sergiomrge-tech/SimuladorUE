@@ -12,6 +12,7 @@ void UResortEconomy::Initialize()
 {
 	ResortData::LoadBuildings(BuildingDefs);
 	ResortData::LoadGuests(GuestDefs);
+	ResortData::LoadUpgrades(UpgradeDefs);
 
 	Buildings.Reset();
 	Notifications.Reset();
@@ -126,6 +127,31 @@ const FBuildingDef* UResortEconomy::FindBuildingDef(const FString& Id) const
 	return nullptr;
 }
 
+const FUpgradeDef* UResortEconomy::FindUpgradeDef(const FString& Id) const
+{
+	for (const FUpgradeDef& U : UpgradeDefs)
+	{
+		if (U.Id == Id)
+		{
+			return &U;
+		}
+	}
+	return nullptr;
+}
+
+TArray<const FUpgradeDef*> UResortEconomy::GetUpgradesFor(const FBuildingDef& Building) const
+{
+	TArray<const FUpgradeDef*> Out;
+	for (const FUpgradeDef& U : UpgradeDefs)
+	{
+		if (U.AppliesTo(Building) && Out.Num() < 4)
+		{
+			Out.Add(&U);
+		}
+	}
+	return Out;
+}
+
 TArray<const FBuildingDef*> UResortEconomy::GetUnlockedBuildings() const
 {
 	TArray<const FBuildingDef*> Result;
@@ -191,7 +217,7 @@ void UResortEconomy::EndDay()
 	Buildings.RemoveAll([](const TWeakObjectPtr<ABuildingActor>& P) { return !P.IsValid(); });
 	for (const TWeakObjectPtr<ABuildingActor>& P : Buildings)
 	{
-		Upkeep += P->GetDef().UpkeepPerDay;
+		Upkeep += P->GetUpkeep();
 	}
 
 	const int32 FinishedDay = Day;

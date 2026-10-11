@@ -63,6 +63,10 @@ void AResortCharacter::EnsureInput()
 	SaveAction = MakeAction(TEXT("IA_Save"), EInputActionValueType::Boolean);
 	LoadAction = MakeAction(TEXT("IA_Load"), EInputActionValueType::Boolean);
 	NewGameAction = MakeAction(TEXT("IA_NewGame"), EInputActionValueType::Boolean);
+	for (int32 i = 0; i < 4; ++i)
+	{
+		UpgradeActions.Add(MakeAction(*FString::Printf(TEXT("IA_Upgrade%d"), i + 1), EInputActionValueType::Boolean));
+	}
 
 	InputContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Resort"));
 
@@ -109,6 +113,13 @@ void AResortCharacter::EnsureInput()
 	InputContext->MapKey(SaveAction, EKeys::F5);
 	InputContext->MapKey(LoadAction, EKeys::F9);
 	InputContext->MapKey(NewGameAction, EKeys::F7);
+	if (UpgradeActions.Num() >= 4)
+	{
+		InputContext->MapKey(UpgradeActions[0], EKeys::One);
+		InputContext->MapKey(UpgradeActions[1], EKeys::Two);
+		InputContext->MapKey(UpgradeActions[2], EKeys::Three);
+		InputContext->MapKey(UpgradeActions[3], EKeys::Four);
+	}
 }
 
 void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -137,6 +148,10 @@ void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(SaveAction, ETriggerEvent::Started, this, &AResortCharacter::SaveKey);
 	Input->BindAction(LoadAction, ETriggerEvent::Started, this, &AResortCharacter::LoadKey);
 	Input->BindAction(NewGameAction, ETriggerEvent::Started, this, &AResortCharacter::NewGameKey);
+	for (int32 i = 0; i < UpgradeActions.Num(); ++i)
+	{
+		Input->BindAction(UpgradeActions[i], ETriggerEvent::Started, this, &AResortCharacter::BuyUpgradeSlot, i);
+	}
 }
 
 void AResortCharacter::PawnClientRestart()
@@ -250,7 +265,71 @@ void AResortCharacter::Tick(float DeltaSeconds)
 	if (bBuildMode)
 	{
 		UpdateGhost();
+		FocusedBuilding.Reset();
 	}
+	else
+	{
+		FocusTimer -= DeltaSeconds;
+		if (FocusTimer <= 0.f)
+		{
+			FocusTimer = 0.1f;
+			UpdateFocus();
+		}
+	}
+}
+
+void AResortCharacter::UpdateFocus()
+{
+	UWorld* World = GetWorld();
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	FocusedBuilding.Reset();
+	if (World == nullptr || PC == nullptr)
+	{
+		return;
+	}
+	FVector CamLoc;
+	FRotator CamRot;
+	PC->GetPlayerViewPoint(CamLoc, CamRot);
+	FCollisionQueryParams Query(SCENE_QUERY_STAT(ResortFocus), false, this);
+	FHitResult Hit;
+	if (World->LineTraceSingleByChannel(Hit, CamLoc, CamLoc + CamRot.Vector() * 1200.f, ECC_Visibility, Query))
+	{
+		ABuildingActor* Building = Cast<ABuildingActor>(Hit.GetActor());
+		if (Building != nullptr && Building->GetMode() == EBuildingMode::Placed)
+		{
+			FocusedBuilding = Building;
+		}
+	}
+}
+
+void AResortCharacter::BuyUpgradeSlot(int32 Slot)
+{
+	UResortEconomy* Economy = AResortGameMode::GetEconomy(this);
+	ABuildingActor* Building = FocusedBuilding.Get();
+	if (bBuildMode || Economy == nullptr || Building == nullptr)
+	{
+		return;
+	}
+	const TArray<const FUpgradeDef*> List = Economy->GetUpgradesFor(Building->GetDef());
+	if (!List.IsValidIndex(Slot))
+	{
+		return;
+	}
+	const FUpgradeDef& U = *List[Slot];
+	if (Building->HasUpgrade(U.Id))
+	{
+		return;
+	}
+	const int32 Cost = U.CostFor(Building->GetDef());
+	if (!Economy->TrySpend(static_cast<float>(Cost)))
+	{
+		Economy->PushNotification(TEXT("Dinheiro insuficiente para a melhoria."), FLinearColor(1.f, 0.5f, 0.4f));
+		return;
+	}
+	Building->ApplyUpgrade(U);
+	Economy->PushNotification(
+		FString::Printf(TEXT("%s: %s instalado (-R$ %d)"), *Building->GetDef().DisplayName, *U.Name, Cost),
+		FLinearColor(1.f, 0.85f, 0.3f));
 }
 
 void AResortCharacter::UpdateGhost()

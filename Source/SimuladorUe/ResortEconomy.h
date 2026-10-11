@@ -58,6 +58,9 @@ public:
 	const TArray<FBuildingDef>& GetBuildingDefs() const { return BuildingDefs; }
 	const TArray<FGuestDef>& GetGuestDefs() const { return GuestDefs; }
 	const FBuildingDef* FindBuildingDef(const FString& Id) const;
+	const FUpgradeDef* FindUpgradeDef(const FString& Id) const;
+	/** Melhorias disponiveis para essa construcao (maximo 4). */
+	TArray<const FUpgradeDef*> GetUpgradesFor(const FBuildingDef& Building) const;
 	/** Construcoes liberadas no nivel atual. */
 	TArray<const FBuildingDef*> GetUnlockedBuildings() const;
 
@@ -83,6 +86,7 @@ private:
 
 	TArray<FBuildingDef> BuildingDefs;
 	TArray<FGuestDef> GuestDefs;
+	TArray<FUpgradeDef> UpgradeDefs;
 	TArray<TWeakObjectPtr<ABuildingActor>> Buildings;
 	TArray<FResortNotification> Notifications;
 

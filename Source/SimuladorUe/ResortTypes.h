@@ -43,6 +43,33 @@ struct FBuildingDef
 	}
 };
 
+/** Melhoria comprada por construcao (Content/Data/Upgrades.json): cama, armario, cardapio... */
+struct FUpgradeDef
+{
+	FString Id;
+	FString Name;
+	/** Categoria da construcao que aceita a melhoria. */
+	FString Category;
+	/** Se preenchido, vale so para essa construcao (ex.: "cabin"). */
+	FString BuildingId;
+	/** Custo = custo da construcao x este fator. */
+	float CostFactor = 0.25f;
+	/** Aumento da renda por visita (0.2 = +20%). */
+	float IncomeBonus = 0.15f;
+	float SatisfactionBonus = 0.02f;
+	/** Aumento da manutencao diaria, em fracao da manutencao base. */
+	float UpkeepFactor = 0.1f;
+
+	int32 CostFor(const FBuildingDef& B) const
+	{
+		return FMath::Max(10, FMath::RoundToInt(B.Cost * CostFactor / 10.f) * 10);
+	}
+	bool AppliesTo(const FBuildingDef& B) const
+	{
+		return Category == B.Category && (BuildingId.IsEmpty() || BuildingId == B.Id);
+	}
+};
+
 /** Definicao de um tipo de hospede (carregada de Content/Data/Guests.json). */
 struct FGuestDef
 {

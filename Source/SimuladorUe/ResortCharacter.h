@@ -37,6 +37,8 @@ public:
 	int32 GetSelectedIndex() const { return SelectedIndex; }
 	bool IsPlacementValid() const { return bPlacementValid; }
 	const FString& GetStatusText() const { return StatusText; }
+	/** Construcao sob a mira (fora do modo construcao). */
+	ABuildingActor* GetFocusedBuilding() const { return FocusedBuilding.Get(); }
 
 private:
 	void EnsureInput();
@@ -57,6 +59,8 @@ private:
 	void SaveKey();
 	void LoadKey();
 	void NewGameKey();
+	void BuyUpgradeSlot(int32 Slot);
+	void UpdateFocus();
 
 	void CycleSelection(int32 Direction);
 	void UpdateGhost();
@@ -93,6 +97,12 @@ private:
 	TObjectPtr<UInputAction> LoadAction;
 	UPROPERTY()
 	TObjectPtr<UInputAction> NewGameAction;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UInputAction>> UpgradeActions;
+
+	TWeakObjectPtr<ABuildingActor> FocusedBuilding;
+	float FocusTimer = 0.f;
 
 	UPROPERTY()
 	TObjectPtr<ABuildingActor> Ghost;

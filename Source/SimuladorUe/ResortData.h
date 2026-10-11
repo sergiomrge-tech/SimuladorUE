@@ -8,4 +8,5 @@ namespace ResortData
 {
 	void LoadBuildings(TArray<FBuildingDef>& Out);
 	void LoadGuests(TArray<FGuestDef>& Out);
+	void LoadUpgrades(TArray<FUpgradeDef>& Out);
 }

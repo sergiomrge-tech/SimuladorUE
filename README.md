@@ -42,6 +42,11 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
 - Uma bolinha sobre a cabeça do hóspede mostra o humor (verde feliz, amarelo ok, vermelho irritado); filas longas geram reclamações.
 - **Hospedes** chegam pela entrada da praia, escolhem construções que podem pagar,
   usam, pagam e vão embora. Satisfação alta vira **prestígio**.
+- **Melhorias:** olhe para uma construção (fora do modo construção) e aperte **1-4** para
+  instalar melhorias (cardápio, cozinha, cama, armário, frigobar, sauna...). Cada uma custa
+  uma parte do valor da construção, aumenta a renda (nos quartos, a diária), a satisfação e a
+  manutenção. Uma esfera dourada no telhado marca cada melhoria. Os dados ficam em
+  `Content/Data/Upgrades.json`.
 - **Prestígio** sobe o **nível** do resort e libera novas construções e hóspedes mais ricos:
   1 Quiosque → 2 Barraca de Praia → 3 Beach Club → 4 Pousada → 5 Resort.
 - Cada construção tem **manutenção diária**. Sem dinheiro para pagar, o prestígio cai.

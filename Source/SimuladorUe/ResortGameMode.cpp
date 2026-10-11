@@ -150,6 +150,12 @@ void AResortGameMode::SaveResort(bool bQuiet)
 		B->SetNumberField(TEXT("X"), P->GetActorLocation().X);
 		B->SetNumberField(TEXT("Y"), P->GetActorLocation().Y);
 		B->SetNumberField(TEXT("Yaw"), P->GetActorRotation().Yaw);
+		TArray<TSharedPtr<FJsonValue>> Ups;
+		for (const FString& UId : P->GetUpgradeIds())
+		{
+			Ups.Add(MakeShared<FJsonValueString>(UId));
+		}
+		B->SetArrayField(TEXT("Upgrades"), Ups);
 		List.Add(MakeShared<FJsonValueObject>(B));
 	}
 
@@ -250,6 +256,17 @@ bool AResortGameMode::LoadResort(bool bQuiet)
 			if (B != nullptr)
 			{
 				B->InitFromDef(*Def, EBuildingMode::Placed);
+				const TArray<TSharedPtr<FJsonValue>>* Ups = nullptr;
+				if (O->TryGetArrayField(TEXT("Upgrades"), Ups) && Ups != nullptr)
+				{
+					for (const TSharedPtr<FJsonValue>& UV : *Ups)
+					{
+						if (const FUpgradeDef* U = Economy->FindUpgradeDef(UV->AsString()))
+						{
+							B->ApplyUpgrade(*U);
+						}
+					}
+				}
 			}
 		}
 	}

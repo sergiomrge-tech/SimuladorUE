@@ -1,0 +1,130 @@
+{
+  "Upgrades": [
+    {
+      "Id": "menu",
+      "Name": "Card\u00e1pio Premium",
+      "Category": "food",
+      "CostFactor": 0.2,
+      "IncomeBonus": 0.25,
+      "SatisfactionBonus": 0.02,
+      "UpkeepFactor": 0.08
+    },
+    {
+      "Id": "kitchen",
+      "Name": "Cozinha Equipada",
+      "Category": "food",
+      "CostFactor": 0.35,
+      "IncomeBonus": 0.3,
+      "SatisfactionBonus": 0.03,
+      "UpkeepFactor": 0.12
+    },
+    {
+      "Id": "decor_food",
+      "Name": "Mobili\u00e1rio Elegante",
+      "Category": "food",
+      "CostFactor": 0.25,
+      "IncomeBonus": 0.15,
+      "SatisfactionBonus": 0.06,
+      "UpkeepFactor": 0.06
+    },
+    {
+      "Id": "cushions",
+      "Name": "Almofadas e Toalhas",
+      "Category": "shade",
+      "CostFactor": 0.5,
+      "IncomeBonus": 0.2,
+      "SatisfactionBonus": 0.05,
+      "UpkeepFactor": 0.1
+    },
+    {
+      "Id": "cooler",
+      "Name": "Frigobar Port\u00e1til",
+      "Category": "shade",
+      "CostFactor": 0.8,
+      "IncomeBonus": 0.3,
+      "SatisfactionBonus": 0.03,
+      "UpkeepFactor": 0.15
+    },
+    {
+      "Id": "equipment",
+      "Name": "Equipamentos Novos",
+      "Category": "entertainment",
+      "CostFactor": 0.3,
+      "IncomeBonus": 0.2,
+      "SatisfactionBonus": 0.05,
+      "UpkeepFactor": 0.08
+    },
+    {
+      "Id": "lights",
+      "Name": "Ilumina\u00e7\u00e3o e Som",
+      "Category": "entertainment",
+      "CostFactor": 0.25,
+      "IncomeBonus": 0.15,
+      "SatisfactionBonus": 0.04,
+      "UpkeepFactor": 0.06
+    },
+    {
+      "Id": "bed",
+      "Name": "Cama Premium",
+      "Category": "lodging",
+      "CostFactor": 0.3,
+      "IncomeBonus": 0.3,
+      "SatisfactionBonus": 0.05,
+      "UpkeepFactor": 0.06
+    },
+    {
+      "Id": "wardrobe",
+      "Name": "Arm\u00e1rio Embutido",
+      "Category": "lodging",
+      "CostFactor": 0.18,
+      "IncomeBonus": 0.12,
+      "SatisfactionBonus": 0.03,
+      "UpkeepFactor": 0.04
+    },
+    {
+      "Id": "minibar",
+      "Name": "Frigobar e Cafeteira",
+      "Category": "lodging",
+      "CostFactor": 0.22,
+      "IncomeBonus": 0.2,
+      "SatisfactionBonus": 0.03,
+      "UpkeepFactor": 0.08
+    },
+    {
+      "Id": "tv",
+      "Name": "TV e Wi-Fi",
+      "Category": "lodging",
+      "CostFactor": 0.15,
+      "IncomeBonus": 0.15,
+      "SatisfactionBonus": 0.04,
+      "UpkeepFactor": 0.05
+    },
+    {
+      "Id": "massage",
+      "Name": "Massagem Premium",
+      "Category": "wellness",
+      "CostFactor": 0.35,
+      "IncomeBonus": 0.25,
+      "SatisfactionBonus": 0.04,
+      "UpkeepFactor": 0.1
+    },
+    {
+      "Id": "aroma",
+      "Name": "Aromaterapia",
+      "Category": "wellness",
+      "CostFactor": 0.2,
+      "IncomeBonus": 0.12,
+      "SatisfactionBonus": 0.06,
+      "UpkeepFactor": 0.05
+    },
+    {
+      "Id": "sauna",
+      "Name": "Sauna",
+      "Category": "wellness",
+      "CostFactor": 0.45,
+      "IncomeBonus": 0.3,
+      "SatisfactionBonus": 0.03,
+      "UpkeepFactor": 0.15
+    }
+  ]
+}
