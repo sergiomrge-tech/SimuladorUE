@@ -54,6 +54,9 @@ private:
 	void RotateGhost();
 	void PlaceBuilding();
 	void DemolishBuilding();
+	void SaveKey();
+	void LoadKey();
+	void NewGameKey();
 
 	void CycleSelection(int32 Direction);
 	void UpdateGhost();
@@ -84,6 +87,12 @@ private:
 	TObjectPtr<UInputAction> PlaceAction;
 	UPROPERTY()
 	TObjectPtr<UInputAction> DemolishAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> SaveAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> LoadAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> NewGameAction;
 
 	UPROPERTY()
 	TObjectPtr<ABuildingActor> Ghost;

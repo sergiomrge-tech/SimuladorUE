@@ -60,6 +60,9 @@ void AResortCharacter::EnsureInput()
 	RotateAction = MakeAction(TEXT("IA_Rotate"), EInputActionValueType::Boolean);
 	PlaceAction = MakeAction(TEXT("IA_Place"), EInputActionValueType::Boolean);
 	DemolishAction = MakeAction(TEXT("IA_Demolish"), EInputActionValueType::Boolean);
+	SaveAction = MakeAction(TEXT("IA_Save"), EInputActionValueType::Boolean);
+	LoadAction = MakeAction(TEXT("IA_Load"), EInputActionValueType::Boolean);
+	NewGameAction = MakeAction(TEXT("IA_NewGame"), EInputActionValueType::Boolean);
 
 	InputContext = NewObject<UInputMappingContext>(this, TEXT("IMC_Resort"));
 
@@ -103,6 +106,9 @@ void AResortCharacter::EnsureInput()
 	InputContext->MapKey(RotateAction, EKeys::R);
 	InputContext->MapKey(PlaceAction, EKeys::LeftMouseButton);
 	InputContext->MapKey(DemolishAction, EKeys::X);
+	InputContext->MapKey(SaveAction, EKeys::F5);
+	InputContext->MapKey(LoadAction, EKeys::F9);
+	InputContext->MapKey(NewGameAction, EKeys::F7);
 }
 
 void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -128,6 +134,9 @@ void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(RotateAction, ETriggerEvent::Started, this, &AResortCharacter::RotateGhost);
 	Input->BindAction(PlaceAction, ETriggerEvent::Started, this, &AResortCharacter::PlaceBuilding);
 	Input->BindAction(DemolishAction, ETriggerEvent::Started, this, &AResortCharacter::DemolishBuilding);
+	Input->BindAction(SaveAction, ETriggerEvent::Started, this, &AResortCharacter::SaveKey);
+	Input->BindAction(LoadAction, ETriggerEvent::Started, this, &AResortCharacter::LoadKey);
+	Input->BindAction(NewGameAction, ETriggerEvent::Started, this, &AResortCharacter::NewGameKey);
 }
 
 void AResortCharacter::PawnClientRestart()
@@ -365,6 +374,30 @@ void AResortCharacter::PlaceBuilding()
 	Economy->PushNotification(
 		FString::Printf(TEXT("%s construído (-R$ %d)"), *Def->DisplayName, Def->Cost),
 		FLinearColor(0.7f, 0.9f, 1.f));
+}
+
+void AResortCharacter::SaveKey()
+{
+	if (AResortGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<AResortGameMode>() : nullptr)
+	{
+		GM->SaveResort();
+	}
+}
+
+void AResortCharacter::LoadKey()
+{
+	if (AResortGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<AResortGameMode>() : nullptr)
+	{
+		GM->LoadResort();
+	}
+}
+
+void AResortCharacter::NewGameKey()
+{
+	if (AResortGameMode* GM = GetWorld() ? GetWorld()->GetAuthGameMode<AResortGameMode>() : nullptr)
+	{
+		GM->NewResort();
+	}
 }
 
 void AResortCharacter::DemolishBuilding()

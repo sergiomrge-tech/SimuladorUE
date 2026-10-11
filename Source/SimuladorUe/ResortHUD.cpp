@@ -142,7 +142,7 @@ void AResortHUD::DrawHUD()
 		const UWorld* World = GetWorld();
 		const bool bFirstSeconds = World != nullptr && World->GetTimeSeconds() < 30.f;
 		const bool bBuilding = Player != nullptr && Player->IsBuildMode();
-		FString Hint = TEXT("WASD mover   Shift correr   B: modo construção");
+		FString Hint = TEXT("WASD mover   Shift correr   B: construir   F5: salvar   F9: carregar");
 		if (bFirstSeconds && !bBuilding)
 		{
 			Hint = TEXT("Aperte B para construir mais coisas na praia. WASD mover, Shift correr.");

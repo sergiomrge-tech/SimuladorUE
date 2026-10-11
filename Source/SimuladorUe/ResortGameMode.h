@@ -27,6 +27,12 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
+	/** Salva/carrega o resort em Saved/resort_save.json. */
+	void SaveResort(bool bQuiet = false);
+	bool LoadResort(bool bQuiet = false);
+	/** Apaga o save e recomeca a praia do zero. */
+	void NewResort();
+
 	/** Acesso rapido a economia a partir de qualquer objeto do mundo. */
 	static UResortEconomy* GetEconomy(const UObject* WorldContext);
 
@@ -52,6 +58,7 @@ private:
 	TObjectPtr<APlayerStart> PlayerStartActor;
 
 	bool bWorldBuilt = false;
+	int32 LastAutosaveDay = 1;
 	float GuestSpawnTimer = 0.f;
 	float SunUpdateTimer = 0.f;
 };

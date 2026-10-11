@@ -20,6 +20,16 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "Math/RandomStream.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "Dom/JsonObject.h"
+#include "Dom/JsonValue.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 
 namespace
 {
@@ -104,6 +114,157 @@ void AResortGameMode::EnsureWorldBuilt()
 	BuildAtmosphere();
 	SpawnPalms();
 	SpawnStartingKiosk();
+
+	// Continua o jogo salvo, se houver
+	if (LoadResort(true) && Economy != nullptr)
+	{
+		LastAutosaveDay = Economy->GetDay();
+		Economy->PushNotification(TEXT("Jogo carregado. (F5 salva, F9 recarrega, F7 novo jogo)"), FLinearColor(0.6f, 1.f, 0.6f));
+	}
+}
+
+namespace
+{
+	FString SavePath()
+	{
+		return FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("resort_save.json"));
+	}
+}
+
+void AResortGameMode::SaveResort(bool bQuiet)
+{
+	if (Economy == nullptr)
+	{
+		return;
+	}
+
+	TArray<TSharedPtr<FJsonValue>> List;
+	for (const TWeakObjectPtr<ABuildingActor>& P : Economy->GetBuildings())
+	{
+		if (!P.IsValid())
+		{
+			continue;
+		}
+		TSharedRef<FJsonObject> B = MakeShared<FJsonObject>();
+		B->SetStringField(TEXT("Id"), P->GetDef().Id);
+		B->SetNumberField(TEXT("X"), P->GetActorLocation().X);
+		B->SetNumberField(TEXT("Y"), P->GetActorLocation().Y);
+		B->SetNumberField(TEXT("Yaw"), P->GetActorRotation().Yaw);
+		List.Add(MakeShared<FJsonValueObject>(B));
+	}
+
+	TSharedRef<FJsonObject> Root = MakeShared<FJsonObject>();
+	Root->SetNumberField(TEXT("Money"), Economy->GetMoney());
+	Root->SetNumberField(TEXT("Prestige"), Economy->GetPrestige());
+	Root->SetNumberField(TEXT("Day"), Economy->GetDay());
+	Root->SetNumberField(TEXT("DayClock"), Economy->GetDayClock());
+	Root->SetArrayField(TEXT("Buildings"), List);
+
+	FString Text;
+	const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Text);
+	FJsonSerializer::Serialize(Root, Writer);
+
+	const bool bOk = FFileHelper::SaveStringToFile(Text, *SavePath());
+	if (!bQuiet || !bOk)
+	{
+		Economy->PushNotification(bOk ? TEXT("Jogo salvo.") : TEXT("Não foi possível salvar o jogo."),
+			bOk ? FLinearColor(0.6f, 1.f, 0.6f) : FLinearColor(1.f, 0.4f, 0.3f));
+	}
+}
+
+bool AResortGameMode::LoadResort(bool bQuiet)
+{
+	UWorld* World = GetWorld();
+	FString Text;
+	if (World == nullptr || Economy == nullptr || !FFileHelper::LoadFileToString(Text, *SavePath()))
+	{
+		if (!bQuiet && Economy != nullptr)
+		{
+			Economy->PushNotification(TEXT("Nenhum jogo salvo encontrado."), FLinearColor(1.f, 0.7f, 0.3f));
+		}
+		return false;
+	}
+
+	TSharedPtr<FJsonObject> Root;
+	const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+	if (!FJsonSerializer::Deserialize(Reader, Root) || !Root.IsValid())
+	{
+		UE_LOG(LogResort, Warning, TEXT("Save invalido: %s"), *SavePath());
+		return false;
+	}
+
+	// Remove o que existe agora (construcoes e hospedes)
+	TArray<ABuildingActor*> OldBuildings;
+	for (const TWeakObjectPtr<ABuildingActor>& P : Economy->GetBuildings())
+	{
+		if (P.IsValid())
+		{
+			OldBuildings.Add(P.Get());
+		}
+	}
+	for (ABuildingActor* B : OldBuildings)
+	{
+		B->Destroy();
+	}
+	TArray<AGuestCharacter*> OldGuests;
+	for (TActorIterator<AGuestCharacter> It(World); It; ++It)
+	{
+		OldGuests.Add(*It);
+	}
+	for (AGuestCharacter* G : OldGuests)
+	{
+		G->Destroy();
+	}
+
+	double Money = 1000.0, Prestige = 0.0, Day = 1.0, Clock = 0.0;
+	Root->TryGetNumberField(TEXT("Money"), Money);
+	Root->TryGetNumberField(TEXT("Prestige"), Prestige);
+	Root->TryGetNumberField(TEXT("Day"), Day);
+	Root->TryGetNumberField(TEXT("DayClock"), Clock);
+	Economy->SetState(static_cast<float>(Money), static_cast<float>(Prestige), static_cast<int32>(Day), static_cast<float>(Clock));
+
+	const TArray<TSharedPtr<FJsonValue>>* Arr = nullptr;
+	if (Root->TryGetArrayField(TEXT("Buildings"), Arr) && Arr != nullptr)
+	{
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		for (const TSharedPtr<FJsonValue>& V : *Arr)
+		{
+			const TSharedPtr<FJsonObject> O = V.IsValid() ? V->AsObject() : nullptr;
+			FString Id;
+			double X = 0.0, Y = 0.0, Yaw = 0.0;
+			if (!O.IsValid() || !O->TryGetStringField(TEXT("Id"), Id))
+			{
+				continue;
+			}
+			O->TryGetNumberField(TEXT("X"), X);
+			O->TryGetNumberField(TEXT("Y"), Y);
+			O->TryGetNumberField(TEXT("Yaw"), Yaw);
+			const FBuildingDef* Def = Economy->FindBuildingDef(Id);
+			if (Def == nullptr)
+			{
+				continue;
+			}
+			ABuildingActor* B = World->SpawnActor<ABuildingActor>(
+				ABuildingActor::StaticClass(), FVector(X, Y, 0.0), FRotator(0.0, Yaw, 0.0), Params);
+			if (B != nullptr)
+			{
+				B->InitFromDef(*Def, EBuildingMode::Placed);
+			}
+		}
+	}
+
+	if (!bQuiet)
+	{
+		Economy->PushNotification(TEXT("Jogo carregado."), FLinearColor(0.6f, 1.f, 0.6f));
+	}
+	return true;
+}
+
+void AResortGameMode::NewResort()
+{
+	IFileManager::Get().Delete(*SavePath());
+	UGameplayStatics::OpenLevel(this, FName(*UGameplayStatics::GetCurrentLevelName(this, true)));
 }
 
 // ------------------------------------------------------------- Mundo
@@ -391,6 +552,13 @@ void AResortGameMode::Tick(float DeltaSeconds)
 	}
 
 	Economy->Tick(DeltaSeconds);
+
+	// Salva sozinho a cada novo dia
+	if (Economy->GetDay() != LastAutosaveDay)
+	{
+		LastAutosaveDay = Economy->GetDay();
+		SaveResort(true);
+	}
 
 	SunUpdateTimer += DeltaSeconds;
 	if (SunUpdateTimer >= 0.2f)

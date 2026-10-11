@@ -175,6 +175,16 @@ void UResortEconomy::PushNotification(const FString& Text, const FLinearColor& C
 	}
 }
 
+void UResortEconomy::SetState(float InMoney, float InPrestige, int32 InDay, float InDayClock)
+{
+	Money = FMath::Max(0.f, InMoney);
+	Prestige = FMath::Max(0.f, InPrestige);
+	Day = FMath::Max(1, InDay);
+	DayClock = FMath::Clamp(InDayClock, 0.f, DayLengthSeconds);
+	TodayEarned = 0.f;
+	LastTier = GetTier();
+}
+
 void UResortEconomy::EndDay()
 {
 	float Upkeep = 0.f;

@@ -50,6 +50,10 @@ public:
 	float GetDayFraction() const { return DayLengthSeconds > 0.f ? DayClock / DayLengthSeconds : 0.f; }
 	float GetHourOfDay() const { return StartHour + GetDayFraction() * (EndHour - StartHour); }
 
+	/** Usado pelo salvar/carregar. */
+	float GetDayClock() const { return DayClock; }
+	void SetState(float InMoney, float InPrestige, int32 InDay, float InDayClock);
+
 	// ---- Dados ----
 	const TArray<FBuildingDef>& GetBuildingDefs() const { return BuildingDefs; }
 	const TArray<FGuestDef>& GetGuestDefs() const { return GuestDefs; }

@@ -32,6 +32,10 @@ Se algo falhar na compilação, copie a mensagem de erro e me mande.
 | R | gira a construção em 90° |
 | Clique esquerdo | constrói |
 | X | demole a construção na mira (devolve 50%) |
+| F5 / F9 | salva / carrega o jogo (também salva sozinho a cada dia) |
+| F7 | novo jogo (apaga o save) |
+
+O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde parou.
 
 ## Como o jogo funciona
 
@@ -81,5 +85,5 @@ Config/            renderização (Lumen/Nanite), canal de colisão, entrada
 - Visual final: assets do Fab/Quixel, água com o plugin Water, materiais estilizados,
   pós-processo com contorno suave.
 - Mais hóspedes com personalidade, filas e reclamações.
-- Salvar/carregar o jogo, menu inicial, sons e música.
+- Menu inicial, sons e música.
 - Pacote (build) para Windows.
