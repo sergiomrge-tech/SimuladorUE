@@ -39,6 +39,7 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
 
 ## Como o jogo funciona
 
+- Uma bolinha sobre a cabeça do hóspede mostra o humor (verde feliz, amarelo ok, vermelho irritado); filas longas geram reclamações.
 - **Hospedes** chegam pela entrada da praia, escolhem construções que podem pagar,
   usam, pagam e vão embora. Satisfação alta vira **prestígio**.
 - **Prestígio** sobe o **nível** do resort e libera novas construções e hóspedes mais ricos:

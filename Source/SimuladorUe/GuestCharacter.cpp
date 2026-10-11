@@ -3,6 +3,8 @@
 #include "ResortGameMode.h"
 #include "ResortVisuals.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AGuestCharacter::AGuestCharacter()
@@ -50,6 +52,9 @@ void AGuestCharacter::InitGuest(const FGuestDef& InDef)
 	ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(0.f, 0.f, 74.f), FVector(28.f, 28.f, 30.f), FRotator::ZeroRotator, Skin, false);
 	ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(-1.f, 0.f, 82.f), FVector(27.f, 27.f, 15.f), FRotator::ZeroRotator, Hair[FMath::RandRange(0, 2)], false);
 
+	// Indicador de humor sobre a cabeca: verde feliz, amarelo ok, vermelho irritado
+	MoodBall = ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(0.f, 0.f, 110.f), FVector(14.f, 14.f, 14.f), FRotator::ZeroRotator, FLinearColor(0.3f, 0.9f, 0.3f), false);
+
 	if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
 	{
 		Economy->OnGuestArrived();
@@ -90,12 +95,53 @@ bool AGuestCharacter::MoveToward(const FVector& Destination, float AcceptRadius)
 	return false;
 }
 
+void AGuestCharacter::UpdateMood(bool bForce)
+{
+	const int32 Bucket = Satisfaction >= 0.6f ? 0 : (Satisfaction >= 0.3f ? 1 : 2);
+	if (!bForce && Bucket == MoodBucket)
+	{
+		return;
+	}
+	MoodBucket = Bucket;
+	if (MoodBall == nullptr)
+	{
+		return;
+	}
+	static const FLinearColor Colors[3] = {
+		FLinearColor(0.2f, 0.9f, 0.25f), FLinearColor(0.95f, 0.8f, 0.15f), FLinearColor(0.95f, 0.15f, 0.1f) };
+	if (UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(MoodBall->GetMaterial(0)))
+	{
+		Mid->SetVectorParameterValue(TEXT("Color"), Colors[Bucket]);
+	}
+}
+
+void AGuestCharacter::Complain(const FString& Reason)
+{
+	// Nem toda reclamacao vira aviso, para nao poluir a tela
+	if (FMath::FRand() > 0.5f)
+	{
+		return;
+	}
+	if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
+	{
+		Economy->PushNotification(FString::Printf(TEXT("%s reclamou: %s"), *Def.DisplayName, *Reason),
+			FLinearColor(1.f, 0.55f, 0.3f));
+	}
+}
+
 void AGuestCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	if (!bInitialized)
 	{
 		return;
+	}
+
+	MoodTimer -= DeltaSeconds;
+	if (MoodTimer <= 0.f)
+	{
+		MoodTimer = 0.5f;
+		UpdateMood(false);
 	}
 
 	Age += DeltaSeconds;
@@ -146,6 +192,7 @@ void AGuestCharacter::Tick(float DeltaSeconds)
 		else if (WaitTime > 8.f)
 		{
 			// Cansou de esperar na fila
+			Complain(FString::Printf(TEXT("fila muito longa em %s"), *Building->GetDef().DisplayName));
 			Satisfaction = FMath::Max(0.f, Satisfaction - 0.15f);
 			--VisitsLeft;
 			PickNextTarget();
@@ -231,6 +278,7 @@ void AGuestCharacter::PickNextTarget()
 		if (VisitedIds.Num() == 0)
 		{
 			Satisfaction = FMath::Max(0.f, Satisfaction - 0.2f); // nao achou nada para fazer
+			Complain(TEXT("não há nada para fazer aqui"));
 		}
 		StartLeaving();
 		return;
@@ -293,6 +341,7 @@ void AGuestCharacter::FinishUsing()
 	{
 		// A construcao sumiu enquanto o hospede usava
 		Satisfaction = FMath::Max(0.f, Satisfaction - 0.1f);
+		Complain(TEXT("o lugar fechou enquanto usava"));
 	}
 
 	Target.Reset();

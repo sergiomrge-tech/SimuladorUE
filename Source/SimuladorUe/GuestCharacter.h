@@ -6,6 +6,8 @@
 #include "BuildingActor.h"
 #include "GuestCharacter.generated.h"
 
+class UStaticMeshComponent;
+
 enum class EGuestState : uint8
 {
 	ToBuilding,
@@ -38,6 +40,8 @@ private:
 	void BeginUsing(ABuildingActor* Building);
 	void FinishUsing();
 	/** Anda em direcao ao destino no plano XY. Retorna true ao chegar. */
+	void UpdateMood(bool bForce);
+	void Complain(const FString& Reason);
 	bool MoveToward(const FVector& Destination, float AcceptRadius);
 
 	FGuestDef Def;
@@ -53,6 +57,10 @@ private:
 	float Timer = 0.f;
 	float WaitTime = 0.f;
 	float Age = 0.f;
+	int32 MoodBucket = -1;
+	float MoodTimer = 0.f;
+	UPROPERTY()
+	TObjectPtr<UStaticMeshComponent> MoodBall;
 
 	/** Tempo maximo na praia antes de ir embora (segundos). */
 	static constexpr float MaxAge = 240.f;
