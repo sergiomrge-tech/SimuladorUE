@@ -51,6 +51,16 @@ Para editar com acentos facilmente, altere `Tools/gerar_dados.py` e rode:
 python Tools/gerar_dados.py
 ```
 
+## Trocar uma forma básica por um modelo 3D final
+
+1. Importe ou adicione o modelo ao projeto (Fab, ou arraste o arquivo no Content Browser).
+2. Botão direito no asset → **Copy Reference** e cole o caminho em `MESH_OVERRIDES`
+   dentro de `Tools/gerar_dados.py` (há um exemplo comentado).
+3. Rode `python Tools/gerar_dados.py`. Ajuste `MeshScale`, `MeshYaw` e `MeshOffset`
+   até encaixar na caixa de colisão (`Size`).
+
+Se o modelo não for encontrado, o jogo volta às formas básicas e avisa no Output Log.
+
 ## Estrutura
 
 ```

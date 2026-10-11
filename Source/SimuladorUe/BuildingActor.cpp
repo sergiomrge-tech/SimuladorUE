@@ -1,6 +1,8 @@
 #include "BuildingActor.h"
+#include "SimuladorUe.h"
 #include "ResortVisuals.h"
 #include "ResortEconomy.h"
+#include "Engine/StaticMesh.h"
 #include "ResortGameMode.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -95,6 +97,36 @@ void ABuildingActor::BuildVisuals()
 	const FLinearColor C = Def.Color;
 	const FLinearColor RoofColor(0.45f, 0.18f, 0.12f);
 	const FLinearColor DarkColor(0.1f, 0.07f, 0.05f);
+
+	// Modelo final (Fab/Quixel etc.): so nas construcoes de verdade. A previa verde/vermelha
+	// continua usando formas basicas, porque elas aceitam a cor de validade.
+	if (!Def.MeshPath.IsEmpty() && Mode != EBuildingMode::Ghost)
+	{
+		UStaticMesh* Model = LoadObject<UStaticMesh>(nullptr, *Def.MeshPath);
+		if (Model != nullptr)
+		{
+			UStaticMeshComponent* Comp = NewObject<UStaticMeshComponent>(this);
+			Comp->SetStaticMesh(Model);
+			Comp->SetMobility(EComponentMobility::Movable);
+			Comp->SetCanEverAffectNavigation(false);
+			Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			Comp->SetupAttachment(GetRootComponent());
+			Comp->SetRelativeLocation(Def.MeshOffset);
+			Comp->SetRelativeRotation(FRotator(0.f, Def.MeshYaw, 0.f));
+			Comp->SetRelativeScale3D(FVector(Def.MeshScale));
+			Comp->RegisterComponent();
+			Parts.Add(Comp);
+
+			// Colisao e alvo do "demolir": caixa invisivel com o tamanho da definicao
+			if (UStaticMeshComponent* Hitbox = Part(TEXT("Cube"), FVector(0.f, 0.f, S.Z * 0.5f), S, C))
+			{
+				Hitbox->SetVisibility(false);
+				Hitbox->SetCastShadow(false);
+			}
+			return;
+		}
+		UE_LOG(LogResort, Warning, TEXT("Modelo nao encontrado: %s (usando formas basicas)"), *Def.MeshPath);
+	}
 
 	if (Def.Id == TEXT("umbrella"))
 	{

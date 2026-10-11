@@ -29,6 +29,13 @@ BUILDINGS = [
     ("hotel", "Bloco do Resort", "lodging", 5, 42000, 420, 30, 20, 0.40, 220, (1400, 700, 900), (0.96, 0.93, 0.86)),
 ]
 
+# Modelos 3D finais (opcional). Depois de importar/baixar um asset na Unreal, aponte aqui:
+#   "kiosk": {"Mesh": "/Game/Fab/Praia/SM_Quiosque.SM_Quiosque", "MeshScale": 1.0,
+#             "MeshYaw": 0, "MeshOffset": [0, 0, 0]},
+# O caminho aparece no Content Browser (botao direito no asset > Copy Reference).
+# Se o modelo nao for achado, o jogo usa as formas basicas.
+MESH_OVERRIDES = {}
+
 GUESTS = [
     # id, nome, nivel minimo, orcamento min, max, velocidade, visitas min, max, peso,
     # categoria preferida, cor da camisa
@@ -60,6 +67,7 @@ def main():
             "Size": list(size),
             "Color": list(color),
         })
+        buildings[-1].update(MESH_OVERRIDES.get(bid, {}))
 
     guests = []
     for (gid, name, tier, bmin, bmax, speed, vmin, vmax, weight, pref, shirt) in GUESTS:

@@ -26,6 +26,16 @@ struct FBuildingDef
 	FVector Size = FVector(200.f, 200.f, 200.f);
 	FLinearColor Color = FLinearColor::White;
 
+	/**
+	 * Modelo 3D final opcional (ex.: "/Game/Fab/Praia/SM_Quiosque.SM_Quiosque").
+	 * Se vazio ou nao encontrado, usa as formas basicas provisorias.
+	 * O tamanho (Size) continua valendo para colisao e espaco ocupado.
+	 */
+	FString MeshPath;
+	float MeshScale = 1.f;
+	float MeshYaw = 0.f;
+	FVector MeshOffset = FVector(0.f, 0.f, 0.f);
+
 	/** Construcoes fechadas: o hospede "entra" e some enquanto usa. */
 	bool IsEnclosed() const
 	{

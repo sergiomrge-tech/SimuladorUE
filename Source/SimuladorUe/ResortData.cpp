@@ -105,6 +105,15 @@ void ResortData::LoadBuildings(TArray<FBuildingDef>& Out)
 			{
 				D.Color = FLinearColor(R, G, B);
 			}
+
+			D.MeshPath = GetString(Obj, TEXT("Mesh"), TEXT(""));
+			D.MeshScale = GetNumber(Obj, TEXT("MeshScale"), 1.f);
+			D.MeshYaw = GetNumber(Obj, TEXT("MeshYaw"), 0.f);
+			float OX = 0.f, OY = 0.f, OZ = 0.f;
+			if (GetTriple(Obj, TEXT("MeshOffset"), OX, OY, OZ))
+			{
+				D.MeshOffset = FVector(OX, OY, OZ);
+			}
 			Out.Add(D);
 		}
 	}
