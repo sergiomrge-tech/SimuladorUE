@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""Gera Content/Data/Buildings.json e Content/Data/Guests.json.
+
+Edite os numeros aqui (ou direto nos JSONs) para balancear o jogo e rode:
+    python Tools/gerar_dados.py
+
+O JSON sai em ASCII puro (acentos viram \\uXXXX), o que evita problemas de
+codificacao ao ler o arquivo dentro da Unreal.
+
+Categorias de construcao: food, shade, entertainment, lodging, wellness
+Niveis: 1 Quiosque, 2 Barraca de Praia, 3 Beach Club, 4 Pousada, 5 Resort
+Medidas em cm.
+"""
+import json
+from pathlib import Path
+
+BUILDINGS = [
+    # id, nome, categoria, nivel, custo, renda/visita, segundos de uso, capacidade,
+    # satisfacao, manutencao/dia, tamanho (x,y,z), cor (r,g,b)
+    ("kiosk", "Quiosque", "food", 1, 700, 14, 4, 3, 0.12, 8, (300, 260, 260), (0.78, 0.52, 0.28)),
+    ("umbrella", "Guarda-sol com Mesa", "shade", 1, 120, 4, 14, 4, 0.10, 1, (240, 240, 230), (0.95, 0.25, 0.20)),
+    ("lounger", "Espreguiçadeira", "shade", 1, 90, 6, 20, 1, 0.15, 1, (200, 70, 55), (0.95, 0.95, 0.90)),
+    ("beach_bar", "Bar de Praia", "food", 2, 1400, 26, 5, 4, 0.15, 18, (420, 300, 280), (0.20, 0.62, 0.70)),
+    ("volley", "Quadra de Vôlei", "entertainment", 2, 1800, 9, 18, 6, 0.22, 6, (900, 500, 230), (0.95, 0.88, 0.70)),
+    ("pool", "Piscina", "entertainment", 3, 4800, 16, 20, 10, 0.25, 25, (700, 450, 40), (0.05, 0.55, 0.75)),
+    ("restaurant", "Restaurante", "food", 3, 6500, 48, 9, 12, 0.22, 45, (800, 600, 320), (0.90, 0.82, 0.65)),
+    ("cabin", "Chalé", "lodging", 4, 9500, 140, 25, 2, 0.30, 40, (450, 400, 320), (0.70, 0.50, 0.32)),
+    ("spa", "Spa", "wellness", 4, 14000, 90, 18, 4, 0.30, 70, (700, 600, 320), (0.75, 0.85, 0.80)),
+    ("hotel", "Bloco do Resort", "lodging", 5, 42000, 420, 30, 20, 0.40, 220, (1400, 700, 900), (0.96, 0.93, 0.86)),
+]
+
+GUESTS = [
+    # id, nome, nivel minimo, orcamento min, max, velocidade, visitas min, max, peso,
+    # categoria preferida, cor da camisa
+    ("turista", "Turista", 1, 40, 110, 220, 2, 3, 5, "shade", (0.20, 0.50, 0.90)),
+    ("familia", "Família", 2, 90, 260, 200, 3, 4, 3, "entertainment", (0.90, 0.60, 0.20)),
+    ("amigos", "Grupo de Amigos", 2, 60, 200, 240, 3, 5, 3, "food", (0.85, 0.25, 0.45)),
+    ("casal", "Casal", 3, 150, 500, 190, 3, 4, 2, "wellness", (0.30, 0.75, 0.55)),
+    ("vip", "Hóspede VIP", 4, 400, 1500, 180, 3, 5, 1, "lodging", (0.95, 0.85, 0.30)),
+]
+
+
+def main():
+    out_dir = Path(__file__).resolve().parent.parent / "Content" / "Data"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    buildings = []
+    for (bid, name, cat, tier, cost, income, secs, cap, sat, upkeep, size, color) in BUILDINGS:
+        buildings.append({
+            "Id": bid,
+            "DisplayName": name,
+            "Category": cat,
+            "Tier": tier,
+            "Cost": cost,
+            "IncomePerVisit": income,
+            "ServiceSeconds": secs,
+            "Capacity": cap,
+            "Satisfaction": sat,
+            "UpkeepPerDay": upkeep,
+            "Size": list(size),
+            "Color": list(color),
+        })
+
+    guests = []
+    for (gid, name, tier, bmin, bmax, speed, vmin, vmax, weight, pref, shirt) in GUESTS:
+        guests.append({
+            "Id": gid,
+            "DisplayName": name,
+            "MinTier": tier,
+            "BudgetMin": bmin,
+            "BudgetMax": bmax,
+            "WalkSpeed": speed,
+            "MinVisits": vmin,
+            "MaxVisits": vmax,
+            "Weight": weight,
+            "PreferredCategory": pref,
+            "ShirtColor": list(shirt),
+        })
+
+    # ensure_ascii=True (padrao): acentos viram \uXXXX
+    (out_dir / "Buildings.json").write_text(
+        json.dumps({"Buildings": buildings}, indent=2) + "\n", encoding="utf-8")
+    (out_dir / "Guests.json").write_text(
+        json.dumps({"Guests": guests}, indent=2) + "\n", encoding="utf-8")
+    print(f"OK: {len(buildings)} construcoes e {len(guests)} tipos de hospede em {out_dir}")
+
+
+if __name__ == "__main__":
+    main()

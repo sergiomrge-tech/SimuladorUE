@@ -1,0 +1,224 @@
+{
+  "Buildings": [
+    {
+      "Id": "kiosk",
+      "DisplayName": "Quiosque",
+      "Category": "food",
+      "Tier": 1,
+      "Cost": 700,
+      "IncomePerVisit": 14,
+      "ServiceSeconds": 4,
+      "Capacity": 3,
+      "Satisfaction": 0.12,
+      "UpkeepPerDay": 8,
+      "Size": [
+        300,
+        260,
+        260
+      ],
+      "Color": [
+        0.78,
+        0.52,
+        0.28
+      ]
+    },
+    {
+      "Id": "umbrella",
+      "DisplayName": "Guarda-sol com Mesa",
+      "Category": "shade",
+      "Tier": 1,
+      "Cost": 120,
+      "IncomePerVisit": 4,
+      "ServiceSeconds": 14,
+      "Capacity": 4,
+      "Satisfaction": 0.1,
+      "UpkeepPerDay": 1,
+      "Size": [
+        240,
+        240,
+        230
+      ],
+      "Color": [
+        0.95,
+        0.25,
+        0.2
+      ]
+    },
+    {
+      "Id": "lounger",
+      "DisplayName": "Espregui\u00e7adeira",
+      "Category": "shade",
+      "Tier": 1,
+      "Cost": 90,
+      "IncomePerVisit": 6,
+      "ServiceSeconds": 20,
+      "Capacity": 1,
+      "Satisfaction": 0.15,
+      "UpkeepPerDay": 1,
+      "Size": [
+        200,
+        70,
+        55
+      ],
+      "Color": [
+        0.95,
+        0.95,
+        0.9
+      ]
+    },
+    {
+      "Id": "beach_bar",
+      "DisplayName": "Bar de Praia",
+      "Category": "food",
+      "Tier": 2,
+      "Cost": 1400,
+      "IncomePerVisit": 26,
+      "ServiceSeconds": 5,
+      "Capacity": 4,
+      "Satisfaction": 0.15,
+      "UpkeepPerDay": 18,
+      "Size": [
+        420,
+        300,
+        280
+      ],
+      "Color": [
+        0.2,
+        0.62,
+        0.7
+      ]
+    },
+    {
+      "Id": "volley",
+      "DisplayName": "Quadra de V\u00f4lei",
+      "Category": "entertainment",
+      "Tier": 2,
+      "Cost": 1800,
+      "IncomePerVisit": 9,
+      "ServiceSeconds": 18,
+      "Capacity": 6,
+      "Satisfaction": 0.22,
+      "UpkeepPerDay": 6,
+      "Size": [
+        900,
+        500,
+        230
+      ],
+      "Color": [
+        0.95,
+        0.88,
+        0.7
+      ]
+    },
+    {
+      "Id": "pool",
+      "DisplayName": "Piscina",
+      "Category": "entertainment",
+      "Tier": 3,
+      "Cost": 4800,
+      "IncomePerVisit": 16,
+      "ServiceSeconds": 20,
+      "Capacity": 10,
+      "Satisfaction": 0.25,
+      "UpkeepPerDay": 25,
+      "Size": [
+        700,
+        450,
+        40
+      ],
+      "Color": [
+        0.05,
+        0.55,
+        0.75
+      ]
+    },
+    {
+      "Id": "restaurant",
+      "DisplayName": "Restaurante",
+      "Category": "food",
+      "Tier": 3,
+      "Cost": 6500,
+      "IncomePerVisit": 48,
+      "ServiceSeconds": 9,
+      "Capacity": 12,
+      "Satisfaction": 0.22,
+      "UpkeepPerDay": 45,
+      "Size": [
+        800,
+        600,
+        320
+      ],
+      "Color": [
+        0.9,
+        0.82,
+        0.65
+      ]
+    },
+    {
+      "Id": "cabin",
+      "DisplayName": "Chal\u00e9",
+      "Category": "lodging",
+      "Tier": 4,
+      "Cost": 9500,
+      "IncomePerVisit": 140,
+      "ServiceSeconds": 25,
+      "Capacity": 2,
+      "Satisfaction": 0.3,
+      "UpkeepPerDay": 40,
+      "Size": [
+        450,
+        400,
+        320
+      ],
+      "Color": [
+        0.7,
+        0.5,
+        0.32
+      ]
+    },
+    {
+      "Id": "spa",
+      "DisplayName": "Spa",
+      "Category": "wellness",
+      "Tier": 4,
+      "Cost": 14000,
+      "IncomePerVisit": 90,
+      "ServiceSeconds": 18,
+      "Capacity": 4,
+      "Satisfaction": 0.3,
+      "UpkeepPerDay": 70,
+      "Size": [
+        700,
+        600,
+        320
+      ],
+      "Color": [
+        0.75,
+        0.85,
+        0.8
+      ]
+    },
+    {
+      "Id": "hotel",
+      "DisplayName": "Bloco do Resort",
+      "Category": "lodging",
+      "Tier": 5,
+      "Cost": 42000,
+      "IncomePerVisit": 420,
+      "ServiceSeconds": 30,
+      "Capacity": 20,
+      "Satisfaction": 0.4,
+      "UpkeepPerDay": 220,
+      "Size": [
+        1400,
+        700,
+        900
+      ],
+      "Color": [
+        0.96,
+        0.93,
+        0.86
+      ]
+    }
+  ]
+}
