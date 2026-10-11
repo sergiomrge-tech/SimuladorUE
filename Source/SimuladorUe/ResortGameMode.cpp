@@ -177,6 +177,8 @@ void AResortGameMode::SaveResort(bool bQuiet)
 	Root->SetNumberField(TEXT("Prestige"), Economy->GetPrestige());
 	Root->SetNumberField(TEXT("Day"), Economy->GetDay());
 	Root->SetNumberField(TEXT("DayClock"), Economy->GetDayClock());
+	Root->SetNumberField(TEXT("Mission"), Economy->GetMissionIndex());
+	Root->SetNumberField(TEXT("GuestsServed"), Economy->GetGuestsServed());
 	Root->SetNumberField(TEXT("Waiters"), Economy->GetWaiters());
 	Root->SetNumberField(TEXT("Cleaners"), Economy->GetCleaners());
 	Root->SetArrayField(TEXT("Buildings"), List);
@@ -244,6 +246,10 @@ bool AResortGameMode::LoadResort(bool bQuiet)
 	Root->TryGetNumberField(TEXT("DayClock"), Clock);
 	Economy->SetState(static_cast<float>(Money), static_cast<float>(Prestige), static_cast<int32>(Day), static_cast<float>(Clock));
 
+	double MissionSaved = 0.0, ServedSaved = 0.0;
+	Root->TryGetNumberField(TEXT("Mission"), MissionSaved);
+	Root->TryGetNumberField(TEXT("GuestsServed"), ServedSaved);
+	Economy->SetMissionState(static_cast<int32>(MissionSaved), static_cast<int32>(ServedSaved));
 	double WaitersSaved = 0.0, CleanersSaved = 0.0;
 	Root->TryGetNumberField(TEXT("Waiters"), WaitersSaved);
 	Root->TryGetNumberField(TEXT("Cleaners"), CleanersSaved);
@@ -687,6 +693,7 @@ void AResortGameMode::BuildAtmosphere()
 	UExponentialHeightFogComponent* Fog = NewObject<UExponentialHeightFogComponent>(Holder, TEXT("Fog"));
 	Fog->SetupAttachment(Root);
 	Fog->SetFogDensity(0.004f);
+	FogComp = Fog;
 	Fog->RegisterComponent();
 
 	// Pos-processamento "realista estilizado": cores mais vivas, contraste suave, brilho e vinheta leve
@@ -837,6 +844,14 @@ void AResortGameMode::UpdateSun()
 	const FLinearColor Noon(1.f, 0.96f, 0.9f);
 	const FLinearColor Golden(1.f, 0.62f, 0.35f);
 	SunComponent->SetLightColor(Noon + (Golden - Noon) * Warm);
+
+	// Dia de chuva: sol fraco e neblina
+	const bool bRain = Economy->GetEvent() == EResortEvent::Rain;
+	SunComponent->SetIntensity(bRain ? 3.f : 9.f);
+	if (FogComp != nullptr)
+	{
+		FogComp->SetFogDensity(bRain ? 0.02f : 0.004f);
+	}
 }
 
 void AResortGameMode::Tick(float DeltaSeconds)
@@ -896,7 +911,7 @@ void AResortGameMode::Tick(float DeltaSeconds)
 	const int32 MaxGuests = FMath::Min(8 + 3 * BuildingCount, 60);
 	if (Economy->GetGuestCount() < MaxGuests)
 	{
-		const float Interval = FMath::Clamp(14.f / (1.f + 0.35f * BuildingCount + Economy->GetPrestige() / 60.f), 2.f, 14.f);
+		const float Interval = FMath::Clamp(14.f / (1.f + 0.35f * BuildingCount + Economy->GetPrestige() / 300.f), 2.f, 14.f) / Economy->GetSpawnMultiplier();
 		GuestSpawnTimer += DeltaSeconds;
 		if (GuestSpawnTimer >= Interval)
 		{

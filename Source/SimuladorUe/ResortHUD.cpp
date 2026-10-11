@@ -74,6 +74,25 @@ void AResortHUD::DrawHUD()
 			FLinearColor(0.7f, 0.75f, 0.8f), 36.f * S, 214.f * S, Small, 0.9f * S);
 	}
 
+	// ------------------------------------------------ Missao e evento do dia
+	{
+		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.45f), 20.f * S, 252.f * S, 400.f * S, Economy->HasMission() ? 84.f * S : 40.f * S);
+		DrawText(Economy->HasMission() ? TEXT("MISSÃO") : TEXT("MISSÕES"), Gold, 36.f * S, 258.f * S, Small, 1.0f * S);
+		DrawText(Economy->GetMissionText(), White, 36.f * S, 278.f * S, Small, 0.9f * S);
+		if (Economy->HasMission())
+		{
+			int32 Cur = 0, Tgt = 1, Reward = 0;
+			Economy->GetMissionProgress(Cur, Tgt, Reward);
+			DrawText(FString::Printf(TEXT("%d / %d   Recompensa: R$ %d"), FMath::Min(Cur, Tgt), Tgt, Reward),
+				Green, 36.f * S, 302.f * S, Small, 0.9f * S);
+		}
+		const FString EventName = Economy->GetEventName();
+		if (!EventName.IsEmpty())
+		{
+			DrawText(EventName, FLinearColor(0.6f, 0.9f, 1.f), 36.f * S, (Economy->HasMission() ? 346.f : 300.f) * S, Small, 1.0f * S);
+		}
+	}
+
 	// ------------------------------------------------ Mira
 	DrawRect(FLinearColor(1.f, 1.f, 1.f, 0.85f), W * 0.5f - 2.f, H * 0.5f - 2.f, 4.f, 4.f);
 

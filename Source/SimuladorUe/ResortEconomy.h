@@ -17,6 +17,16 @@ struct FResortNotification
  * Estado do resort: dinheiro, prestigio, nivel, relogio do dia e lista de
  * construcoes. Vive dentro do GameMode (um por partida).
  */
+/** Evento do dia (sorteado no fim de cada dia, a partir do dia 3). */
+enum class EResortEvent : uint8
+{
+	None,
+	Rain,
+	Holiday,
+	Heat,
+	Celebrity
+};
+
 UCLASS()
 class SIMULADORUE_API UResortEconomy : public UObject
 {
@@ -44,6 +54,21 @@ public:
 	float GetTierStartPrestige() const;
 	/** Prestigio necessario para o proximo nivel, ou -1 se ja esta no maximo. */
 	float GetNextTierPrestige() const;
+
+	// ---- Missoes ----
+	bool HasMission() const;
+	FString GetMissionText() const;
+	/** Progresso atual e meta da missao, e a recompensa em dinheiro. */
+	void GetMissionProgress(int32& Current, int32& Target, int32& Reward) const;
+	int32 GetMissionIndex() const { return MissionIndex; }
+	void SetMissionState(int32 InIndex, int32 InGuestsServed) { MissionIndex = FMath::Max(0, InIndex); GuestsServed = FMath::Max(0, InGuestsServed); }
+	int32 GetGuestsServed() const { return GuestsServed; }
+
+	// ---- Eventos do dia ----
+	EResortEvent GetEvent() const { return CurrentEvent; }
+	FString GetEventName() const;
+	/** Multiplicador da chegada de hospedes (chuva diminui, feriado aumenta). */
+	float GetSpawnMultiplier() const;
 
 	// ---- Equipe ----
 	static constexpr int32 MaxStaff = 5;
@@ -98,6 +123,9 @@ public:
 
 private:
 	void EndDay();
+	void CheckMission();
+	void RollEvent();
+	int32 CountUpgrades() const;
 
 	TArray<FBuildingDef> BuildingDefs;
 	TArray<FGuestDef> GuestDefs;
@@ -111,6 +139,10 @@ private:
 	float TodayEarned = 0.f;
 	int32 Day = 1;
 	int32 GuestCount = 0;
+	int32 MissionIndex = 0;
+	int32 GuestsServed = 0;
+	EResortEvent CurrentEvent = EResortEvent::None;
+	float MissionTimer = 0.f;
 	int32 Waiters = 0;
 	int32 Cleaners = 0;
 	int32 LastTier = 1;

@@ -3,12 +3,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ResortTypes.h"
+#include "BuildingActor.h"
 #include "ResortCharacter.generated.h"
 
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
-class ABuildingActor;
+
 struct FInputActionValue;
 
 /**

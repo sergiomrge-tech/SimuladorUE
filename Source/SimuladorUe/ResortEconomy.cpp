@@ -4,8 +4,32 @@
 
 namespace
 {
+	struct FMissionDef
+	{
+		const TCHAR* Text;
+		int32 Kind; // 0 construcoes, 1 prestigio, 2 dinheiro, 3 hospedes atendidos, 4 nivel, 5 melhorias instaladas
+		int32 Target;
+		int32 Reward;
+	};
+
+	const FMissionDef Missions[] = {
+		{ TEXT("Tenha 3 construções"), 0, 3, 150 },
+		{ TEXT("Atenda 10 hóspedes"), 3, 10, 200 },
+		{ TEXT("Instale 2 melhorias (olhe para uma construção e aperte 1-4)"), 5, 2, 300 },
+		{ TEXT("Chegue ao nível 2: Barraca de Praia"), 4, 2, 500 },
+		{ TEXT("Tenha 8 construções"), 0, 8, 600 },
+		{ TEXT("Atenda 100 hóspedes"), 3, 100, 800 },
+		{ TEXT("Junte R$ 5.000"), 2, 5000, 1000 },
+		{ TEXT("Chegue ao nível 3: Beach Club"), 4, 3, 1500 },
+		{ TEXT("Instale 10 melhorias"), 5, 10, 2000 },
+		{ TEXT("Chegue ao nível 4: Pousada"), 4, 4, 4000 },
+		{ TEXT("Atenda 1.000 hóspedes"), 3, 1000, 5000 },
+		{ TEXT("Chegue ao nível 5: Resort"), 4, 5, 20000 },
+	};
+	constexpr int32 MissionCount = UE_ARRAY_COUNT(Missions);
+
 	// Prestigio necessario para cada nivel (indice 0 = nivel 1).
-	const float TierThreshold[5] = { 0.f, 40.f, 120.f, 300.f, 700.f };
+	const float TierThreshold[5] = { 0.f, 60.f, 250.f, 800.f, 2000.f };
 }
 
 void UResortEconomy::Initialize()
@@ -24,6 +48,9 @@ void UResortEconomy::Initialize()
 	GuestCount = 0;
 	Waiters = 0;
 	Cleaners = 0;
+	MissionIndex = 0;
+	GuestsServed = 0;
+	CurrentEvent = EResortEvent::None;
 	LastTier = 1;
 	DayClock = 0.f;
 
@@ -46,6 +73,13 @@ void UResortEconomy::Tick(float DeltaSeconds)
 		{
 			Notifications.RemoveAt(i);
 		}
+	}
+
+	MissionTimer -= DeltaSeconds;
+	if (MissionTimer <= 0.f)
+	{
+		MissionTimer = 1.f;
+		CheckMission();
 	}
 
 	const int32 NowTier = GetTier();
@@ -187,8 +221,9 @@ void UResortEconomy::UnregisterBuilding(ABuildingActor* Building)
 
 void UResortEconomy::OnGuestLeft(float Satisfaction)
 {
+	++GuestsServed;
 	// Satisfacao acima de 0.45 rende prestigio.
-	AddPrestige(FMath::Max(0.f, Satisfaction - 0.45f) * 14.f);
+	AddPrestige(FMath::Max(0.f, Satisfaction - 0.45f) * 1.f);
 }
 
 void UResortEconomy::PushNotification(const FString& Text, const FLinearColor& Color)
@@ -233,7 +268,114 @@ void UResortEconomy::SetStaff(int32 InWaiters, int32 InCleaners)
 
 float UResortEconomy::GetServiceMultiplier(const FBuildingDef& Building) const
 {
-	return Building.IsEnclosed() ? 1.f + 0.06f * Waiters : 1.f;
+	float Mult = Building.IsEnclosed() ? 1.f + 0.06f * Waiters : 1.f;
+	if (CurrentEvent == EResortEvent::Heat && Building.Category == TEXT("food"))
+	{
+		Mult *= 1.2f; // calor: todo mundo quer bebida gelada
+	}
+	return Mult;
+}
+
+int32 UResortEconomy::CountUpgrades() const
+{
+	int32 Total = 0;
+	for (const TWeakObjectPtr<ABuildingActor>& P : Buildings)
+	{
+		if (P.IsValid())
+		{
+			Total += P->GetUpgradeIds().Num();
+		}
+	}
+	return Total;
+}
+
+bool UResortEconomy::HasMission() const
+{
+	return MissionIndex < MissionCount;
+}
+
+FString UResortEconomy::GetMissionText() const
+{
+	return HasMission() ? FString(Missions[MissionIndex].Text) : FString(TEXT("Todas as missões concluídas! Continue crescendo o seu resort."));
+}
+
+void UResortEconomy::GetMissionProgress(int32& Current, int32& Target, int32& Reward) const
+{
+	Current = 0;
+	Target = 1;
+	Reward = 0;
+	if (!HasMission())
+	{
+		return;
+	}
+	const FMissionDef& M = Missions[MissionIndex];
+	Target = M.Target;
+	Reward = M.Reward;
+	switch (M.Kind)
+	{
+	case 0: Current = GetBuildingCount(); break;
+	case 1: Current = FMath::RoundToInt(Prestige); break;
+	case 2: Current = FMath::RoundToInt(Money); break;
+	case 3: Current = GuestsServed; break;
+	case 4: Current = GetTier(); break;
+	default: Current = CountUpgrades(); break;
+	}
+}
+
+void UResortEconomy::CheckMission()
+{
+	if (!HasMission())
+	{
+		return;
+	}
+	int32 Current = 0, Target = 1, Reward = 0;
+	GetMissionProgress(Current, Target, Reward);
+	if (Current >= Target)
+	{
+		AddMoney(static_cast<float>(Reward));
+		PushNotification(
+			FString::Printf(TEXT("Missão cumprida: %s (+R$ %d)"), Missions[MissionIndex].Text, Reward),
+			FLinearColor(1.f, 0.85f, 0.2f));
+		++MissionIndex;
+	}
+}
+
+FString UResortEconomy::GetEventName() const
+{
+	switch (CurrentEvent)
+	{
+	case EResortEvent::Rain: return TEXT("Dia de chuva: poucos hóspedes");
+	case EResortEvent::Holiday: return TEXT("Feriado: praia lotada!");
+	case EResortEvent::Heat: return TEXT("Onda de calor: bebidas vendem mais");
+	case EResortEvent::Celebrity: return TEXT("Celebridade na praia: prestígio extra");
+	default: return FString();
+	}
+}
+
+float UResortEconomy::GetSpawnMultiplier() const
+{
+	switch (CurrentEvent)
+	{
+	case EResortEvent::Rain: return 0.5f;
+	case EResortEvent::Holiday: return 1.8f;
+	case EResortEvent::Celebrity: return 1.3f;
+	default: return 1.f;
+	}
+}
+
+void UResortEconomy::RollEvent()
+{
+	CurrentEvent = EResortEvent::None;
+	if (Day < 3 || FMath::FRand() > 0.3f)
+	{
+		return;
+	}
+	CurrentEvent = static_cast<EResortEvent>(FMath::RandRange(1, 4));
+	PushNotification(GetEventName(), FLinearColor(0.6f, 0.9f, 1.f));
+	if (CurrentEvent == EResortEvent::Celebrity)
+	{
+		AddPrestige(8.f);
+	}
 }
 
 void UResortEconomy::SetState(float InMoney, float InPrestige, int32 InDay, float InDayClock)
@@ -273,9 +415,10 @@ void UResortEconomy::EndDay()
 		else
 		{
 			Money = 0.f;
-			AddPrestige(-3.f);
+			AddPrestige(-2.f);
 			PushNotification(TEXT("Sem dinheiro para a manutenção! O prestígio caiu."), FLinearColor(1.f, 0.35f, 0.3f));
 		}
 	}
 	TodayEarned = 0.f;
+	RollEvent();
 }

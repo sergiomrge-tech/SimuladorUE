@@ -11,6 +11,7 @@ class UResortEconomy;
 class AStaffCharacter;
 class USoundWaveProcedural;
 class UAudioComponent;
+class UExponentialHeightFogComponent;
 
 /**
  * Regras da partida. Como o prototipo nao usa assets de mapa, este GameMode
@@ -90,6 +91,8 @@ private:
 	TWeakObjectPtr<AStaticMeshActor> FenceRight;
 	int32 PlotTier = 0;
 
+	UPROPERTY()
+	TObjectPtr<UExponentialHeightFogComponent> FogComp;
 	UPROPERTY()
 	TObjectPtr<USoundWaveProcedural> SeaWave;
 	UPROPERTY()
