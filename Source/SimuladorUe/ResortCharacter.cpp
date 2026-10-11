@@ -63,6 +63,11 @@ void AResortCharacter::EnsureInput()
 	SaveAction = MakeAction(TEXT("IA_Save"), EInputActionValueType::Boolean);
 	LoadAction = MakeAction(TEXT("IA_Load"), EInputActionValueType::Boolean);
 	NewGameAction = MakeAction(TEXT("IA_NewGame"), EInputActionValueType::Boolean);
+	RoomAction = MakeAction(TEXT("IA_Room"), EInputActionValueType::Boolean);
+	PriceUpAction = MakeAction(TEXT("IA_PriceUp"), EInputActionValueType::Boolean);
+	PriceDownAction = MakeAction(TEXT("IA_PriceDown"), EInputActionValueType::Boolean);
+	StartAction = MakeAction(TEXT("IA_Start"), EInputActionValueType::Boolean);
+	StartAction->bTriggerWhenPaused = true;
 	HireAttendantAction = MakeAction(TEXT("IA_HireAttendant"), EInputActionValueType::Boolean);
 	RegisterAction = MakeAction(TEXT("IA_Register"), EInputActionValueType::Boolean);
 	HireWaiterAction = MakeAction(TEXT("IA_HireWaiter"), EInputActionValueType::Boolean);
@@ -119,6 +124,10 @@ void AResortCharacter::EnsureInput()
 	InputContext->MapKey(SaveAction, EKeys::F5);
 	InputContext->MapKey(LoadAction, EKeys::F9);
 	InputContext->MapKey(NewGameAction, EKeys::F7);
+	InputContext->MapKey(RoomAction, EKeys::Seven);
+	InputContext->MapKey(PriceUpAction, EKeys::Equals);
+	InputContext->MapKey(PriceDownAction, EKeys::Hyphen);
+	InputContext->MapKey(StartAction, EKeys::Enter);
 	InputContext->MapKey(HireAttendantAction, EKeys::Five);
 	InputContext->MapKey(RegisterAction, EKeys::Six);
 	InputContext->MapKey(HireWaiterAction, EKeys::F2);
@@ -159,6 +168,10 @@ void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(SaveAction, ETriggerEvent::Started, this, &AResortCharacter::SaveKey);
 	Input->BindAction(LoadAction, ETriggerEvent::Started, this, &AResortCharacter::LoadKey);
 	Input->BindAction(NewGameAction, ETriggerEvent::Started, this, &AResortCharacter::NewGameKey);
+	Input->BindAction(RoomAction, ETriggerEvent::Started, this, &AResortCharacter::RenovateRoom);
+	Input->BindAction(PriceUpAction, ETriggerEvent::Started, this, &AResortCharacter::PriceUp);
+	Input->BindAction(PriceDownAction, ETriggerEvent::Started, this, &AResortCharacter::PriceDown);
+	Input->BindAction(StartAction, ETriggerEvent::Started, this, &AResortCharacter::StartGame);
 	Input->BindAction(HireAttendantAction, ETriggerEvent::Started, this, &AResortCharacter::HireAttendant);
 	Input->BindAction(RegisterAction, ETriggerEvent::Started, this, &AResortCharacter::BuyRegister);
 	Input->BindAction(HireWaiterAction, ETriggerEvent::Started, this, &AResortCharacter::HireWaiter);
@@ -278,6 +291,14 @@ void AResortCharacter::DestroyGhost()
 void AResortCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	if (!bTitleApplied)
+	{
+		bTitleApplied = true;
+		if (APlayerController* TitlePC = Cast<APlayerController>(GetController()))
+		{
+			TitlePC->SetPause(true); // tela de abertura: o jogo comeca pausado ate apertar Enter
+		}
+	}
 	if (bBuildMode)
 	{
 		UpdateGhost();
@@ -374,8 +395,72 @@ void AResortCharacter::HireCleaner()
 	}
 }
 
+void AResortCharacter::StartGame()
+{
+	if (!bTitleScreen)
+	{
+		return;
+	}
+	bTitleScreen = false;
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetPause(false);
+	}
+}
+
+void AResortCharacter::RenovateRoom()
+{
+	UResortEconomy* Economy = AResortGameMode::GetEconomy(this);
+	ABuildingActor* Building = FocusedBuilding.Get();
+	if (bBuildMode || Economy == nullptr || Building == nullptr || !Building->IsLodging())
+	{
+		return;
+	}
+	const int32 Cost = Building->GetNextRoomCost();
+	if (Cost < 0)
+	{
+		Economy->PushNotification(TEXT("Todos os quartos já estão no nível máximo."), FLinearColor(1.f, 0.7f, 0.3f));
+		return;
+	}
+	if (!Economy->TrySpend(static_cast<float>(Cost)))
+	{
+		Economy->PushNotification(TEXT("Dinheiro insuficiente para reformar o quarto."), FLinearColor(1.f, 0.5f, 0.4f));
+		return;
+	}
+	const int32 Index = Building->RenovateNextRoom();
+	Economy->PushNotification(
+		FString::Printf(TEXT("Quarto %d reformado para o nível %d (-R$ %d)"), Index + 1, Building->GetRoomLevel(Index), Cost),
+		FLinearColor(1.f, 0.85f, 0.3f));
+}
+
+void AResortCharacter::PriceUp()
+{
+	if (ABuildingActor* Building = FocusedBuilding.Get())
+	{
+		if (!bBuildMode)
+		{
+			Building->ChangePrice(0.1f);
+		}
+	}
+}
+
+void AResortCharacter::PriceDown()
+{
+	if (ABuildingActor* Building = FocusedBuilding.Get())
+	{
+		if (!bBuildMode)
+		{
+			Building->ChangePrice(-0.1f);
+		}
+	}
+}
+
 void AResortCharacter::TogglePause()
 {
+	if (bTitleScreen)
+	{
+		return;
+	}
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		PC->SetPause(GetWorld() == nullptr || !GetWorld()->IsPaused());

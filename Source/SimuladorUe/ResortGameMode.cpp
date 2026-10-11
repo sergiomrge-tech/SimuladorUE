@@ -158,6 +158,13 @@ void AResortGameMode::SaveResort(bool bQuiet)
 		}
 		B->SetArrayField(TEXT("Upgrades"), Ups);
 		B->SetNumberField(TEXT("Attendants"), P->GetAttendants());
+		B->SetNumberField(TEXT("Price"), P->GetPriceMultiplier());
+		TArray<TSharedPtr<FJsonValue>> Rooms;
+		for (int32 RL : P->GetRoomLevels())
+		{
+			Rooms.Add(MakeShared<FJsonValueNumber>(RL));
+		}
+		B->SetArrayField(TEXT("Rooms"), Rooms);
 		B->SetBoolField(TEXT("Register"), P->HasRegister());
 		List.Add(MakeShared<FJsonValueObject>(B));
 	}
@@ -266,6 +273,21 @@ bool AResortGameMode::LoadResort(bool bQuiet)
 			if (B != nullptr)
 			{
 				B->InitFromDef(*Def, EBuildingMode::Placed);
+				double Price = 1.0;
+				if (O->TryGetNumberField(TEXT("Price"), Price))
+				{
+					B->SetPriceMultiplier(static_cast<float>(Price));
+				}
+				const TArray<TSharedPtr<FJsonValue>>* RoomArr = nullptr;
+				if (O->TryGetArrayField(TEXT("Rooms"), RoomArr) && RoomArr != nullptr)
+				{
+					TArray<int32> Levels;
+					for (const TSharedPtr<FJsonValue>& RV : *RoomArr)
+					{
+						Levels.Add(static_cast<int32>(RV->AsNumber()));
+					}
+					B->SetRoomLevels(Levels);
+				}
 				double Att = 1.0;
 				bool bReg = false;
 				O->TryGetNumberField(TEXT("Attendants"), Att);
@@ -420,8 +442,12 @@ void AResortGameMode::BuildBeach()
 	const float CenterX = (SeaEdgeX + BackEdgeX) * 0.5f;
 	SpawnBox(FVector(SeaEdgeX + WallThickness * 0.5f, 0.f, WallZ), FVector(WallThickness, SideEdgeY * 2.f + 80.f, WallHeight), FLinearColor::White, false, true);
 	SpawnBox(FVector(BackEdgeX - WallThickness * 0.5f, 0.f, WallZ), FVector(WallThickness, SideEdgeY * 2.f + 80.f, WallHeight), FLinearColor::White, false, true);
-	SpawnBox(FVector(CenterX, SideEdgeY + WallThickness * 0.5f, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
-	SpawnBox(FVector(CenterX, -SideEdgeY - WallThickness * 0.5f, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
+	// As paredes laterais e as cercas acompanham o terreno liberado (UpdatePlot as posiciona)
+	WallLeft = SpawnBox(FVector(CenterX, SideEdgeY, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
+	WallRight = SpawnBox(FVector(CenterX, -SideEdgeY, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
+	FenceLeft = SpawnBox(FVector(CenterX, SideEdgeY, 18.f), FVector(LengthX, 8.f, 36.f), FLinearColor(0.95f, 0.93f, 0.85f), true, false);
+	FenceRight = SpawnBox(FVector(CenterX, -SideEdgeY, 18.f), FVector(LengthX, 8.f, 36.f), FLinearColor(0.95f, 0.93f, 0.85f), true, false);
+	UpdatePlot(false);
 }
 
 void AResortGameMode::BuildSandDetail()
@@ -486,6 +512,56 @@ void AResortGameMode::BuildSandDetail()
 		{
 			Rock->SetActorRotation(FRotator(Rand.FRandRange(-8.f, 8.f), Rand.FRandRange(0.f, 360.f), Rand.FRandRange(-8.f, 8.f)));
 		}
+	}
+}
+
+float AResortGameMode::PlotHalfYForTier(int32 Tier)
+{
+	static const float Halves[5] = { 900.f, 1500.f, 2100.f, 2600.f, 3000.f };
+	return Halves[FMath::Clamp(Tier, 1, 5) - 1];
+}
+
+float AResortGameMode::GetPlotHalfY(const UObject* WorldContext)
+{
+	const UResortEconomy* Eco = GetEconomy(WorldContext);
+	return PlotHalfYForTier(Eco != nullptr ? Eco->GetTier() : 1);
+}
+
+void AResortGameMode::UpdatePlot(bool bAnnounce)
+{
+	if (Economy == nullptr)
+	{
+		return;
+	}
+	const int32 Tier = Economy->GetTier();
+	if (Tier == PlotTier)
+	{
+		return;
+	}
+	PlotTier = Tier;
+	const float Half = PlotHalfYForTier(Tier);
+	const float Thickness = 40.f;
+	if (AStaticMeshActor* A = WallLeft.Get())
+	{
+		A->SetActorLocation(FVector(A->GetActorLocation().X, Half + Thickness * 0.5f, A->GetActorLocation().Z));
+	}
+	if (AStaticMeshActor* A = WallRight.Get())
+	{
+		A->SetActorLocation(FVector(A->GetActorLocation().X, -Half - Thickness * 0.5f, A->GetActorLocation().Z));
+	}
+	if (AStaticMeshActor* A = FenceLeft.Get())
+	{
+		A->SetActorLocation(FVector(A->GetActorLocation().X, Half, A->GetActorLocation().Z));
+	}
+	if (AStaticMeshActor* A = FenceRight.Get())
+	{
+		A->SetActorLocation(FVector(A->GetActorLocation().X, -Half, A->GetActorLocation().Z));
+	}
+	if (bAnnounce)
+	{
+		Economy->PushNotification(
+			FString::Printf(TEXT("Terreno ampliado! Agora a praia tem %d m de largura."), FMath::RoundToInt(Half * 2.f / 100.f)),
+			FLinearColor(0.6f, 1.f, 0.9f));
 	}
 }
 
@@ -732,7 +808,7 @@ void AResortGameMode::SpawnGuest()
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	AGuestCharacter* Guest = World->SpawnActor<AGuestCharacter>(
 		AGuestCharacter::StaticClass(),
-		FVector(GuestSpawnX, FMath::FRandRange(-1500.f, 1500.f), 120.f),
+		FVector(GuestSpawnX, FMath::FRandRange(-1.f, 1.f) * FMath::Min(1500.f, GetPlotHalfY(this) - 150.f), 120.f),
 		FRotator::ZeroRotator, Params);
 	if (Guest != nullptr)
 	{
@@ -770,6 +846,7 @@ void AResortGameMode::Tick(float DeltaSeconds)
 
 	Economy->Tick(DeltaSeconds);
 	UpdateWaves(DeltaSeconds);
+	UpdatePlot(true);
 
 	StaffSyncTimer -= DeltaSeconds;
 	if (StaffSyncTimer <= 0.f)

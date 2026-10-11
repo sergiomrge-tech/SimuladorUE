@@ -37,6 +37,9 @@ Se algo falhar na compilação, copie a mensagem de erro e me mande.
 | 1-4 | compra melhoria da construção na mira |
 | F2 / F3 | contrata garçom / faxineiro |
 | P | pausa |
+| 7 | reforma um quarto do chalé/hotel na mira (+30% na diária dele) |
+| - / + | diminui / aumenta o preço da construção na mira |
+| Enter | começa o jogo (tela de abertura) |
 
 O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde parou.
 
@@ -55,6 +58,13 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
   o primeiro é o dono, de graça) e **6** instala o caixa registradora (atendimento 30% mais rápido).
 - **Equipe:** garçons (+6% de renda em comida, hospedagem e spa) e faxineiros (+satisfação por visita),
   até 5 de cada, com salário diário.
+- **Terreno:** começa pequeno (18 m de largura) e a praia é ampliada a cada novo nível do resort
+  (até 60 m). Uma cerca branca marca o limite.
+- **Quiosque que evolui:** cada melhoria acrescenta algo ao quiosque (placa, mesas, deck, pérgola com
+  luzes) e o nome muda: Quiosque, Quiosque Reformado, Bar do Quiosque, Beach Bar, Restaurante Beira-Mar.
+- **Quartos individuais:** chalés e hotel têm cada quarto com nível próprio (0 a 3); os hóspedes ocupam
+  primeiro os melhores. **Preço:** -/+ muda o preço de qualquer construção (caro rende mais, mas cansa o
+  hóspede). Lojas de comida gastam 25% da venda em produtos.
 - **Estrelas:** cada melhoria sobe a construção em 1 estrela (até 5); hóspedes ricos preferem as de mais estrelas.
 - **Prestígio** sobe o **nível** do resort e libera novas construções e hóspedes mais ricos:
   1 Quiosque → 2 Barraca de Praia → 3 Beach Club → 4 Pousada → 5 Resort.

@@ -75,7 +75,7 @@ void AGuestCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (State == EGuestState::Using && Target.IsValid())
 	{
-		Target->Release();
+		Target->Release(RoomIndex);
 	}
 	if (bCounted)
 	{
@@ -170,7 +170,7 @@ void AGuestCharacter::Tick(float DeltaSeconds)
 		const double Radius = Building->GetDef().IsEnclosed() ? FMath::Max(Half.X, Half.Y) + 40.0 : 90.0;
 		if (MoveToward(Building->GetActorLocation(), Radius))
 		{
-			if (Building->TryReserve())
+			if (Building->TryReserveRoom(RoomIndex))
 			{
 				BeginUsing(Building);
 			}
@@ -191,7 +191,7 @@ void AGuestCharacter::Tick(float DeltaSeconds)
 			break;
 		}
 		WaitTime += DeltaSeconds;
-		if (Building->TryReserve())
+		if (Building->TryReserveRoom(RoomIndex))
 		{
 			BeginUsing(Building);
 		}
@@ -330,12 +330,14 @@ void AGuestCharacter::FinishUsing()
 	if (Building != nullptr && Economy != nullptr)
 	{
 		const FBuildingDef& D = Building->GetDef();
-		const float Pay = FMath::Min(Building->GetIncome(), Budget);
+		const float Pay = FMath::Min(Building->GetIncome(RoomIndex), Budget);
 		Budget -= Pay;
-		Economy->AddMoney(Pay);
+		// Lojas de comida gastam 25% da venda em produtos
+		Economy->AddMoney(Building->IsFoodShop() ? Pay * 0.75f : Pay);
 		Satisfaction = FMath::Min(1.5f, Satisfaction + Building->GetSatisfaction());
 		VisitedIds.Add(D.Id);
-		Building->Release();
+		Building->Release(RoomIndex);
+		RoomIndex = -1;
 
 		if (Pay >= 100.f)
 		{

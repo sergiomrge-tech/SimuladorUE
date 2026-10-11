@@ -67,7 +67,7 @@ void AStaffCharacter::InitStaff(EStaffRole InRole)
 void AStaffCharacter::PickDestination()
 {
 	bHasDestination = true;
-	Destination = FVector(FMath::FRandRange(-2500.f, 300.f), FMath::FRandRange(-1800.f, 1800.f), GetActorLocation().Z);
+	Destination = FVector(FMath::FRandRange(-2500.f, 300.f), FMath::FRandRange(-1.f, 1.f) * (AResortGameMode::GetPlotHalfY(this) - 200.f), GetActorLocation().Z);
 
 	if (Role != EStaffRole::Waiter)
 	{

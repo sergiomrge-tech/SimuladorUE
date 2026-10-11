@@ -57,6 +57,7 @@ private:
 	float Timer = 0.f;
 	float WaitTime = 0.f;
 	float Age = 0.f;
+	int32 RoomIndex = -1;
 	int32 MoodBucket = -1;
 	float MoodTimer = 0.f;
 	UPROPERTY()

@@ -34,6 +34,10 @@ public:
 	/** Apaga o save e recomeca a praia do zero. */
 	void NewResort();
 
+	/** Meia-largura (cm) do terreno liberado em cada nivel do resort: o terreno cresce com o nivel. */
+	static float PlotHalfYForTier(int32 Tier);
+	static float GetPlotHalfY(const UObject* WorldContext);
+
 	/** Acesso rapido a economia a partir de qualquer objeto do mundo. */
 	static UResortEconomy* GetEconomy(const UObject* WorldContext);
 
@@ -47,6 +51,7 @@ private:
 	void UpdateSun();
 	void BuildSandDetail();
 	void SyncStaff();
+	void UpdatePlot(bool bAnnounce);
 	void UpdateWaves(float DeltaSeconds);
 
 	AStaticMeshActor* SpawnBox(const FVector& Center, const FVector& SizeCm, const FLinearColor& Color,
@@ -76,6 +81,12 @@ private:
 	TArray<TWeakObjectPtr<AStaffCharacter>> WaiterActors;
 	TArray<TWeakObjectPtr<AStaffCharacter>> CleanerActors;
 	float StaffSyncTimer = 0.f;
+
+	TWeakObjectPtr<AStaticMeshActor> WallLeft;
+	TWeakObjectPtr<AStaticMeshActor> WallRight;
+	TWeakObjectPtr<AStaticMeshActor> FenceLeft;
+	TWeakObjectPtr<AStaticMeshActor> FenceRight;
+	int32 PlotTier = 0;
 
 	bool bWorldBuilt = false;
 	int32 LastAutosaveDay = 1;

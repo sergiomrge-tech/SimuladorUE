@@ -40,6 +40,11 @@ void ABuildingActor::InitFromDef(const FBuildingDef& InDef, EBuildingMode InMode
 		{
 			SetAttendants(1); // o dono atende de graca no comeco
 		}
+		if (IsLodging())
+		{
+			RoomLevels.Init(0, Def.Capacity);
+			RoomBusy.Init(false, Def.Capacity);
+		}
 		if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
 		{
 			Economy->RegisterBuilding(this);
@@ -77,17 +82,137 @@ void ABuildingActor::SetGhostValid(bool bValid)
 
 bool ABuildingActor::TryReserve()
 {
+	int32 Unused = -1;
+	return TryReserveRoom(Unused);
+}
+
+bool ABuildingActor::TryReserveRoom(int32& OutRoomIndex)
+{
+	OutRoomIndex = -1;
 	if (Occupants >= GetCapacity())
 	{
 		return false;
+	}
+	if (IsLodging() && RoomLevels.Num() > 0)
+	{
+		// Escolhe o melhor quarto livre (os hospedes ocupam primeiro os reformados)
+		int32 Best = -1;
+		for (int32 i = 0; i < RoomLevels.Num(); ++i)
+		{
+			if (!RoomBusy[i] && (Best < 0 || RoomLevels[i] > RoomLevels[Best]))
+			{
+				Best = i;
+			}
+		}
+		if (Best < 0)
+		{
+			return false;
+		}
+		RoomBusy[Best] = true;
+		OutRoomIndex = Best;
 	}
 	++Occupants;
 	return true;
 }
 
-void ABuildingActor::Release()
+void ABuildingActor::Release(int32 RoomIndex)
 {
+	if (RoomBusy.IsValidIndex(RoomIndex))
+	{
+		RoomBusy[RoomIndex] = false;
+	}
 	Occupants = FMath::Max(0, Occupants - 1);
+}
+
+int32 ABuildingActor::GetNextRoomCost() const
+{
+	int32 Lowest = MaxRoomLevel;
+	for (int32 L : RoomLevels)
+	{
+		Lowest = FMath::Min(Lowest, L);
+	}
+	if (RoomLevels.Num() == 0 || Lowest >= MaxRoomLevel)
+	{
+		return -1;
+	}
+	return FMath::Max(10, FMath::RoundToInt(Def.Cost * 0.06f * (Lowest + 1) / 10.f) * 10);
+}
+
+int32 ABuildingActor::RenovateNextRoom()
+{
+	int32 Index = -1;
+	for (int32 i = 0; i < RoomLevels.Num(); ++i)
+	{
+		if (RoomLevels[i] < MaxRoomLevel && (Index < 0 || RoomLevels[i] < RoomLevels[Index]))
+		{
+			Index = i;
+		}
+	}
+	if (Index >= 0)
+	{
+		Invested += GetNextRoomCost();
+		++RoomLevels[Index];
+	}
+	return Index;
+}
+
+void ABuildingActor::SetRoomLevels(const TArray<int32>& Levels)
+{
+	for (int32 i = 0; i < RoomLevels.Num() && i < Levels.Num(); ++i)
+	{
+		RoomLevels[i] = FMath::Clamp(Levels[i], 0, MaxRoomLevel);
+	}
+}
+
+FString ABuildingActor::GetTitle() const
+{
+	if (Def.Id == TEXT("kiosk"))
+	{
+		static const TCHAR* Names[5] = { TEXT("Quiosque"), TEXT("Quiosque Reformado"), TEXT("Bar do Quiosque"),
+			TEXT("Beach Bar"), TEXT("Restaurante Beira-Mar") };
+		return Names[GetStars() - 1];
+	}
+	return Def.DisplayName;
+}
+
+void ABuildingActor::AddEvolutionVisual(int32 UpgradeCount)
+{
+	const FVector S = Def.Size;
+	const float FrontX = S.X * 0.5f;
+	switch (UpgradeCount)
+	{
+	case 1: // placa
+		Part(TEXT("Cube"), FVector(FrontX + 70.f, -S.Y * 0.5f - 10.f, 110.f), FVector(8.f, 8.f, 220.f), FLinearColor(0.4f, 0.28f, 0.16f), false);
+		Part(TEXT("Cube"), FVector(FrontX + 70.f, -S.Y * 0.5f - 10.f, 215.f), FVector(10.f, 90.f, 40.f), FLinearColor(0.95f, 0.85f, 0.4f), false);
+		break;
+	case 2: // mesinhas com banquinhos na frente
+		for (int32 i = 0; i < 2; ++i)
+		{
+			const float Y = (i == 0 ? -1.f : 1.f) * S.Y * 0.28f;
+			Part(TEXT("Cylinder"), FVector(FrontX + 130.f, Y, 55.f), FVector(60.f, 60.f, 6.f), FLinearColor(0.85f, 0.7f, 0.5f), false);
+			Part(TEXT("Cylinder"), FVector(FrontX + 130.f, Y, 27.f), FVector(8.f, 8.f, 54.f), FLinearColor(0.4f, 0.4f, 0.4f), false);
+			Part(TEXT("Cylinder"), FVector(FrontX + 130.f, Y + 55.f, 22.f), FVector(28.f, 28.f, 44.f), FLinearColor(0.9f, 0.3f, 0.25f), false);
+			Part(TEXT("Cylinder"), FVector(FrontX + 130.f, Y - 55.f, 22.f), FVector(28.f, 28.f, 44.f), FLinearColor(0.9f, 0.3f, 0.25f), false);
+		}
+		break;
+	case 3: // deck de madeira
+		Part(TEXT("Cube"), FVector(FrontX + 150.f, 0.f, 4.f), FVector(300.f, S.Y + 120.f, 8.f), FLinearColor(0.55f, 0.38f, 0.22f), false);
+		break;
+	case 4: // pergola com luzinhas
+		for (int32 i = 0; i < 2; ++i)
+		{
+			const float Y = (i == 0 ? -1.f : 1.f) * (S.Y * 0.5f + 50.f);
+			Part(TEXT("Cylinder"), FVector(FrontX + 280.f, Y, 130.f), FVector(10.f, 10.f, 260.f), FLinearColor(0.4f, 0.28f, 0.16f), false);
+		}
+		Part(TEXT("Cube"), FVector(FrontX + 150.f, 0.f, 265.f), FVector(300.f, S.Y + 120.f, 8.f), FLinearColor(0.4f, 0.28f, 0.16f), false);
+		for (int32 i = 0; i < 6; ++i)
+		{
+			Part(TEXT("Sphere"), FVector(FrontX + 60.f + 45.f * i, 0.f, 250.f), FVector(10.f, 10.f, 10.f), FLinearColor(1.f, 0.9f, 0.5f), false);
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 void ABuildingActor::SetAttendants(int32 Count)
@@ -126,14 +251,15 @@ void ABuildingActor::InstallRegister()
 	Part(TEXT("Cube"), FVector(X - 4.f, Def.Size.Y * 0.25f, 138.f), FVector(4.f, 30.f, 16.f), FLinearColor(0.2f, 0.9f, 0.4f), false, FRotator(-20.f, 0.f, 0.f));
 }
 
-float ABuildingActor::GetIncome() const
+float ABuildingActor::GetIncome(int32 RoomIndex) const
 {
 	float Mult = 1.f;
 	if (const UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
 	{
 		Mult = Economy->GetServiceMultiplier(Def);
 	}
-	return Def.IncomePerVisit * (1.f + IncomeBonus) * Mult;
+	const float RoomMult = 1.f + 0.3f * GetRoomLevel(RoomIndex);
+	return Def.IncomePerVisit * (1.f + IncomeBonus) * Mult * RoomMult * PriceMult;
 }
 
 float ABuildingActor::GetSatisfaction() const
@@ -143,7 +269,9 @@ float ABuildingActor::GetSatisfaction() const
 	{
 		Clean = Economy->GetCleanBonus();
 	}
-	return Def.Satisfaction + SatisfactionBonus + Clean;
+	// Preco alto cansa o hospede; preco baixo agrada
+	const float PricePenalty = (PriceMult - 1.f) * 0.12f;
+	return Def.Satisfaction + SatisfactionBonus + Clean - PricePenalty;
 }
 
 bool ABuildingActor::ApplyUpgrade(const FUpgradeDef& Upgrade)
@@ -158,7 +286,12 @@ bool ABuildingActor::ApplyUpgrade(const FUpgradeDef& Upgrade)
 	UpkeepBonus += Upgrade.UpkeepFactor;
 	Invested += Upgrade.CostFor(Def);
 
-	// Marca visual: uma esfera dourada por melhoria, sobre o telhado
+	// Marca visual: lojas de comida "evoluem" (placa, mesas, deck, pergola); as demais ganham esferas douradas
+	if (IsFoodShop())
+	{
+		AddEvolutionVisual(UpgradeIds.Num());
+		return true;
+	}
 	const float Y = (UpgradeIds.Num() - 2.5f) * 36.f;
 	Part(TEXT("Sphere"), FVector(0.f, Y, Def.Size.Z + 45.f), FVector(22.f, 22.f, 22.f), FLinearColor(1.f, 0.8f, 0.2f), false);
 	return true;

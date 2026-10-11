@@ -137,10 +137,10 @@ void AResortHUD::DrawHUD()
 		const float PanelW = 470.f * S;
 		const float PanelX = W - PanelW - 20.f * S;
 		const float RowH = 26.f * S;
-		const float PanelH = 180.f * S + RowH * (Ups.Num() + 3);
+		const float PanelH = 200.f * S + RowH * (Ups.Num() + 5);
 		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.55f), PanelX, 20.f * S, PanelW, PanelH);
 
-		DrawText(BD.DisplayName, Gold, PanelX + 16.f * S, 28.f * S, Medium, 1.0f * S);
+		DrawText(B->GetTitle(), Gold, PanelX + 16.f * S, 28.f * S, Medium, 1.0f * S);
 		const bool bLodging = BD.Category == TEXT("lodging");
 		DrawText(FString::Printf(TEXT("Estrelas: %d de 5"), B->GetStars()), Gold, PanelX + PanelW - 150.f * S, 32.f * S, Small, 1.0f * S);
 		DrawText(FString::Printf(TEXT("%s: R$ %d   Manutenção: R$ %d/dia"),
@@ -152,6 +152,24 @@ void AResortHUD::DrawHUD()
 			Dim, PanelX + 16.f * S, 82.f * S, Small, 0.95f * S);
 
 		float Y = 112.f * S;
+		DrawText(FString::Printf(TEXT("Preço: %d%%  (- / + para mudar; caro rende mais por visita, mas cansa o hóspede)"),
+			FMath::RoundToInt(B->GetPriceMultiplier() * 100.f)), Dim, PanelX + 16.f * S, Y, Small, 0.85f * S);
+		Y += RowH;
+		if (B->IsLodging())
+		{
+			FString Rooms = TEXT("Quartos (nível 0-3): ");
+			for (int32 r = 0; r < B->GetRoomCount(); ++r)
+			{
+				Rooms += FString::Printf(TEXT("%d "), B->GetRoomLevel(r));
+			}
+			DrawText(Rooms, Dim, PanelX + 16.f * S, Y, Small, 0.9f * S);
+			Y += RowH;
+			const int32 RoomCost = B->GetNextRoomCost();
+			DrawText(TEXT("[7] Reformar um quarto (+30% na diária dele)"), RoomCost >= 0 ? White : Dim, PanelX + 16.f * S, Y, Small, 1.0f * S);
+			DrawText(RoomCost >= 0 ? FString::Printf(TEXT("R$ %d"), RoomCost) : FString(TEXT("máximo")),
+				RoomCost >= 0 ? White : Dim, PanelX + PanelW - 120.f * S, Y, Small, 1.0f * S);
+			Y += RowH;
+		}
 		if (B->IsFoodShop())
 		{
 			FString Menu = TEXT("Vende: água de coco");
@@ -195,6 +213,23 @@ void AResortHUD::DrawHUD()
 		{
 			DrawText(TEXT("Aperte o número para comprar a melhoria"), Dim, PanelX + 16.f * S, Y + 8.f * S, Small, 0.9f * S);
 		}
+	}
+
+	// ------------------------------------------------ Tela de abertura
+	if (Player != nullptr && Player->IsTitleScreen())
+	{
+		DrawRect(FLinearColor(0.02f, 0.12f, 0.2f, 0.88f), 0.f, 0.f, W, H);
+		DrawText(TEXT("SIMULADOR DE RESORT"), Gold, W * 0.5f - 330.f * S, H * 0.5f - 230.f * S, Large, 2.0f * S);
+		DrawText(TEXT("Comece com um quiosque na areia e cresça até um resort completo."), White,
+			W * 0.5f - 330.f * S, H * 0.5f - 130.f * S, Medium, 1.0f * S);
+		DrawText(TEXT("1) Aperte B para construir.  2) Olhe para uma construção e use 1-7 para melhorá-la."), Dim,
+			W * 0.5f - 330.f * S, H * 0.5f - 70.f * S, Small, 1.0f * S);
+		DrawText(TEXT("3) Ganhe prestígio com hóspedes felizes para liberar novos níveis e ampliar o terreno."), Dim,
+			W * 0.5f - 330.f * S, H * 0.5f - 40.f * S, Small, 1.0f * S);
+		DrawText(TEXT("WASD mover   Shift correr   P pausa   F5 salvar   F9 carregar   F7 novo jogo"), Dim,
+			W * 0.5f - 330.f * S, H * 0.5f - 10.f * S, Small, 1.0f * S);
+		DrawText(TEXT("Aperte ENTER para começar"), Green, W * 0.5f - 150.f * S, H * 0.5f + 70.f * S, Medium, 1.2f * S);
+		return;
 	}
 
 	// ------------------------------------------------ Pausa

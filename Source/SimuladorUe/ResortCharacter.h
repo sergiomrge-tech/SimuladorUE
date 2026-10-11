@@ -37,6 +37,7 @@ public:
 	int32 GetSelectedIndex() const { return SelectedIndex; }
 	bool IsPlacementValid() const { return bPlacementValid; }
 	const FString& GetStatusText() const { return StatusText; }
+	bool IsTitleScreen() const { return bTitleScreen; }
 	/** Construcao sob a mira (fora do modo construcao). */
 	ABuildingActor* GetFocusedBuilding() const { return FocusedBuilding.Get(); }
 
@@ -60,6 +61,10 @@ private:
 	void LoadKey();
 	void NewGameKey();
 	void BuyUpgradeSlot(int32 Slot);
+	void RenovateRoom();
+	void PriceUp();
+	void PriceDown();
+	void StartGame();
 	void HireAttendant();
 	void BuyRegister();
 	void HireWaiter();
@@ -106,6 +111,14 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> UpgradeActions;
 	UPROPERTY()
+	TObjectPtr<UInputAction> RoomAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> PriceUpAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> PriceDownAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> StartAction;
+	UPROPERTY()
 	TObjectPtr<UInputAction> HireAttendantAction;
 	UPROPERTY()
 	TObjectPtr<UInputAction> RegisterAction;
@@ -118,6 +131,8 @@ private:
 
 	TWeakObjectPtr<ABuildingActor> FocusedBuilding;
 	float FocusTimer = 0.f;
+	bool bTitleScreen = true;
+	bool bTitleApplied = false;
 
 	UPROPERTY()
 	TObjectPtr<ABuildingActor> Ghost;
