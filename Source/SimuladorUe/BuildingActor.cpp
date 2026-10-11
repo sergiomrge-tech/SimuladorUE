@@ -86,6 +86,26 @@ void ABuildingActor::Release()
 	Occupants = FMath::Max(0, Occupants - 1);
 }
 
+float ABuildingActor::GetIncome() const
+{
+	float Mult = 1.f;
+	if (const UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
+	{
+		Mult = Economy->GetServiceMultiplier(Def);
+	}
+	return Def.IncomePerVisit * (1.f + IncomeBonus) * Mult;
+}
+
+float ABuildingActor::GetSatisfaction() const
+{
+	float Clean = 0.f;
+	if (const UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
+	{
+		Clean = Economy->GetCleanBonus();
+	}
+	return Def.Satisfaction + SatisfactionBonus + Clean;
+}
+
 bool ABuildingActor::ApplyUpgrade(const FUpgradeDef& Upgrade)
 {
 	if (UpgradeIds.Contains(Upgrade.Id))

@@ -164,6 +164,8 @@ void AResortGameMode::SaveResort(bool bQuiet)
 	Root->SetNumberField(TEXT("Prestige"), Economy->GetPrestige());
 	Root->SetNumberField(TEXT("Day"), Economy->GetDay());
 	Root->SetNumberField(TEXT("DayClock"), Economy->GetDayClock());
+	Root->SetNumberField(TEXT("Waiters"), Economy->GetWaiters());
+	Root->SetNumberField(TEXT("Cleaners"), Economy->GetCleaners());
 	Root->SetArrayField(TEXT("Buildings"), List);
 
 	FString Text;
@@ -228,6 +230,11 @@ bool AResortGameMode::LoadResort(bool bQuiet)
 	Root->TryGetNumberField(TEXT("Day"), Day);
 	Root->TryGetNumberField(TEXT("DayClock"), Clock);
 	Economy->SetState(static_cast<float>(Money), static_cast<float>(Prestige), static_cast<int32>(Day), static_cast<float>(Clock));
+
+	double WaitersSaved = 0.0, CleanersSaved = 0.0;
+	Root->TryGetNumberField(TEXT("Waiters"), WaitersSaved);
+	Root->TryGetNumberField(TEXT("Cleaners"), CleanersSaved);
+	Economy->SetStaff(static_cast<int32>(WaitersSaved), static_cast<int32>(CleanersSaved));
 
 	const TArray<TSharedPtr<FJsonValue>>* Arr = nullptr;
 	if (Root->TryGetArrayField(TEXT("Buildings"), Arr) && Arr != nullptr)

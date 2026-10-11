@@ -30,7 +30,7 @@ void AResortHUD::DrawHUD()
 	const FLinearColor Dim(0.8f, 0.85f, 0.9f);
 
 	// ------------------------------------------------ Painel principal
-	DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.5f), 20.f * S, 20.f * S, 400.f * S, 190.f * S);
+	DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.5f), 20.f * S, 20.f * S, 400.f * S, 240.f * S);
 
 	DrawText(FString::Printf(TEXT("R$ %s"), *FText::AsNumber(FMath::RoundToInt(Economy->GetMoney())).ToString()),
 		Green, 36.f * S, 30.f * S, Large, 1.3f * S);
@@ -68,6 +68,10 @@ void AResortHUD::DrawHUD()
 		DrawText(FString::Printf(TEXT("Dia %d  %02d:%02d   Hóspedes: %d   Hoje: +R$ %d"),
 			Economy->GetDay(), HH, MM, Economy->GetGuestCount(), FMath::RoundToInt(Economy->GetTodayEarned())),
 			Dim, 36.f * S, 168.f * S, Small, 1.0f * S);
+		DrawText(FString::Printf(TEXT("Equipe: %d garçom, %d faxineiro"), Economy->GetWaiters(), Economy->GetCleaners()),
+			Dim, 36.f * S, 192.f * S, Small, 1.0f * S);
+		DrawText(FString::Printf(TEXT("F2 garçom R$ %d   F3 faxineiro R$ %d"), Economy->GetHireCost(true), Economy->GetHireCost(false)),
+			FLinearColor(0.7f, 0.75f, 0.8f), 36.f * S, 214.f * S, Small, 0.9f * S);
 	}
 
 	// ------------------------------------------------ Mira
@@ -138,6 +142,7 @@ void AResortHUD::DrawHUD()
 
 		DrawText(BD.DisplayName, Gold, PanelX + 16.f * S, 28.f * S, Medium, 1.0f * S);
 		const bool bLodging = BD.Category == TEXT("lodging");
+		DrawText(FString::Printf(TEXT("Estrelas: %d de 5"), B->GetStars()), Gold, PanelX + PanelW - 150.f * S, 32.f * S, Small, 1.0f * S);
 		DrawText(FString::Printf(TEXT("%s: R$ %d   Manutenção: R$ %d/dia"),
 			bLodging ? TEXT("Diária") : TEXT("Renda por visita"),
 			FMath::RoundToInt(B->GetIncome()), FMath::RoundToInt(B->GetUpkeep())),
@@ -164,6 +169,15 @@ void AResortHUD::DrawHUD()
 		{
 			DrawText(TEXT("Aperte o número para comprar a melhoria"), Dim, PanelX + 16.f * S, Y + 8.f * S, Small, 0.9f * S);
 		}
+	}
+
+	// ------------------------------------------------ Pausa
+	if (GetWorld() != nullptr && GetWorld()->IsPaused())
+	{
+		DrawRect(FLinearColor(0.f, 0.f, 0.f, 0.6f), 0.f, 0.f, W, H);
+		DrawText(TEXT("PAUSADO"), Gold, W * 0.5f - 90.f * S, H * 0.5f - 120.f * S, Large, 1.6f * S);
+		DrawText(TEXT("P: continuar   F5: salvar   F9: carregar   F7: novo jogo"), White, W * 0.5f - 270.f * S, H * 0.5f - 40.f * S, Medium, 1.0f * S);
+		DrawText(TEXT("WASD mover   B construir   1-4 melhorias (olhando a construção)   F2/F3 contratar"), Dim, W * 0.5f - 330.f * S, H * 0.5f, Small, 1.0f * S);
 	}
 
 	// ------------------------------------------------ Avisos

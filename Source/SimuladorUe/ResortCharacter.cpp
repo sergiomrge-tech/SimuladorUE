@@ -63,6 +63,10 @@ void AResortCharacter::EnsureInput()
 	SaveAction = MakeAction(TEXT("IA_Save"), EInputActionValueType::Boolean);
 	LoadAction = MakeAction(TEXT("IA_Load"), EInputActionValueType::Boolean);
 	NewGameAction = MakeAction(TEXT("IA_NewGame"), EInputActionValueType::Boolean);
+	HireWaiterAction = MakeAction(TEXT("IA_HireWaiter"), EInputActionValueType::Boolean);
+	HireCleanerAction = MakeAction(TEXT("IA_HireCleaner"), EInputActionValueType::Boolean);
+	PauseAction = MakeAction(TEXT("IA_Pause"), EInputActionValueType::Boolean);
+	PauseAction->bTriggerWhenPaused = true;
 	for (int32 i = 0; i < 4; ++i)
 	{
 		UpgradeActions.Add(MakeAction(*FString::Printf(TEXT("IA_Upgrade%d"), i + 1), EInputActionValueType::Boolean));
@@ -113,6 +117,9 @@ void AResortCharacter::EnsureInput()
 	InputContext->MapKey(SaveAction, EKeys::F5);
 	InputContext->MapKey(LoadAction, EKeys::F9);
 	InputContext->MapKey(NewGameAction, EKeys::F7);
+	InputContext->MapKey(HireWaiterAction, EKeys::F2);
+	InputContext->MapKey(HireCleanerAction, EKeys::F3);
+	InputContext->MapKey(PauseAction, EKeys::P);
 	if (UpgradeActions.Num() >= 4)
 	{
 		InputContext->MapKey(UpgradeActions[0], EKeys::One);
@@ -148,6 +155,9 @@ void AResortCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Input->BindAction(SaveAction, ETriggerEvent::Started, this, &AResortCharacter::SaveKey);
 	Input->BindAction(LoadAction, ETriggerEvent::Started, this, &AResortCharacter::LoadKey);
 	Input->BindAction(NewGameAction, ETriggerEvent::Started, this, &AResortCharacter::NewGameKey);
+	Input->BindAction(HireWaiterAction, ETriggerEvent::Started, this, &AResortCharacter::HireWaiter);
+	Input->BindAction(HireCleanerAction, ETriggerEvent::Started, this, &AResortCharacter::HireCleaner);
+	Input->BindAction(PauseAction, ETriggerEvent::Started, this, &AResortCharacter::TogglePause);
 	for (int32 i = 0; i < UpgradeActions.Num(); ++i)
 	{
 		Input->BindAction(UpgradeActions[i], ETriggerEvent::Started, this, &AResortCharacter::BuyUpgradeSlot, i);
@@ -299,6 +309,30 @@ void AResortCharacter::UpdateFocus()
 		{
 			FocusedBuilding = Building;
 		}
+	}
+}
+
+void AResortCharacter::HireWaiter()
+{
+	if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
+	{
+		Economy->TryHire(true);
+	}
+}
+
+void AResortCharacter::HireCleaner()
+{
+	if (UResortEconomy* Economy = AResortGameMode::GetEconomy(this))
+	{
+		Economy->TryHire(false);
+	}
+}
+
+void AResortCharacter::TogglePause()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		PC->SetPause(GetWorld() == nullptr || !GetWorld()->IsPaused());
 	}
 }
 

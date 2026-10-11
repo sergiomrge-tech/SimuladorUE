@@ -60,6 +60,9 @@ private:
 	void LoadKey();
 	void NewGameKey();
 	void BuyUpgradeSlot(int32 Slot);
+	void HireWaiter();
+	void HireCleaner();
+	void TogglePause();
 	void UpdateFocus();
 
 	void CycleSelection(int32 Direction);
@@ -100,6 +103,12 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<UInputAction>> UpgradeActions;
+	UPROPERTY()
+	TObjectPtr<UInputAction> HireWaiterAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> HireCleanerAction;
+	UPROPERTY()
+	TObjectPtr<UInputAction> PauseAction;
 
 	TWeakObjectPtr<ABuildingActor> FocusedBuilding;
 	float FocusTimer = 0.f;

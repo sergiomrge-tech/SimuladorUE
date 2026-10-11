@@ -48,9 +48,11 @@ public:
 	/** Aplica a melhoria (sem cobrar). Retorna false se ja tinha. */
 	bool ApplyUpgrade(const FUpgradeDef& Upgrade);
 	/** Renda por visita ja com as melhorias (para quartos, a diaria). */
-	float GetIncome() const { return Def.IncomePerVisit * (1.f + IncomeBonus); }
-	float GetSatisfaction() const { return Def.Satisfaction + SatisfactionBonus; }
+float GetIncome() const;
+	float GetSatisfaction() const;
 	float GetUpkeep() const { return Def.UpkeepPerDay * (1.f + UpkeepBonus); }
+	/** Estrelas (1 a 5): sobem a cada melhoria instalada e atraem hospedes mais ricos. */
+	int32 GetStars() const { return FMath::Clamp(1 + UpgradeIds.Num(), 1, 5); }
 	/** Total gasto em melhorias nesta construcao. */
 	int32 GetInvested() const { return Invested; }
 

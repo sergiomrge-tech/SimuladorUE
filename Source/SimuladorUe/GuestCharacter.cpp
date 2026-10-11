@@ -260,6 +260,7 @@ void AGuestCharacter::PickNextTarget()
 		{
 			Weight *= 2.5f;
 		}
+		Weight *= 1.f + 0.15f * (Building->GetStars() - 1) * (Def.BudgetMax >= 400.f ? 2.f : 1.f);
 		if (VisitedIds.Contains(D.Id))
 		{
 			Weight *= 0.25f;

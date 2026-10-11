@@ -21,6 +21,8 @@ void UResortEconomy::Initialize()
 	TodayEarned = 0.f;
 	Day = 1;
 	GuestCount = 0;
+	Waiters = 0;
+	Cleaners = 0;
 	LastTier = 1;
 	DayClock = 0.f;
 
@@ -201,6 +203,38 @@ void UResortEconomy::PushNotification(const FString& Text, const FLinearColor& C
 	}
 }
 
+bool UResortEconomy::TryHire(bool bWaiter)
+{
+	int32& Count = bWaiter ? Waiters : Cleaners;
+	if (Count >= MaxStaff)
+	{
+		PushNotification(TEXT("Equipe completa para essa função."), FLinearColor(1.f, 0.7f, 0.3f));
+		return false;
+	}
+	if (!TrySpend(static_cast<float>(GetHireCost(bWaiter))))
+	{
+		PushNotification(TEXT("Dinheiro insuficiente para contratar."), FLinearColor(1.f, 0.5f, 0.4f));
+		return false;
+	}
+	++Count;
+	PushNotification(
+		FString::Printf(TEXT("%s contratado (-R$ %d, salário R$ %d/dia)"),
+			bWaiter ? TEXT("Garçom") : TEXT("Faxineiro"), GetHireCost(bWaiter), GetSalary(bWaiter)),
+		FLinearColor(0.7f, 0.9f, 1.f));
+	return true;
+}
+
+void UResortEconomy::SetStaff(int32 InWaiters, int32 InCleaners)
+{
+	Waiters = FMath::Clamp(InWaiters, 0, MaxStaff);
+	Cleaners = FMath::Clamp(InCleaners, 0, MaxStaff);
+}
+
+float UResortEconomy::GetServiceMultiplier(const FBuildingDef& Building) const
+{
+	return Building.IsEnclosed() ? 1.f + 0.06f * Waiters : 1.f;
+}
+
 void UResortEconomy::SetState(float InMoney, float InPrestige, int32 InDay, float InDayClock)
 {
 	Money = FMath::Max(0.f, InMoney);
@@ -219,6 +253,8 @@ void UResortEconomy::EndDay()
 	{
 		Upkeep += P->GetUpkeep();
 	}
+
+	Upkeep += static_cast<float>(Waiters * GetSalary(true) + Cleaners * GetSalary(false));
 
 	const int32 FinishedDay = Day;
 	++Day;

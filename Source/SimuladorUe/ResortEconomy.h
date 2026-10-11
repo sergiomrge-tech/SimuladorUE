@@ -45,6 +45,19 @@ public:
 	/** Prestigio necessario para o proximo nivel, ou -1 se ja esta no maximo. */
 	float GetNextTierPrestige() const;
 
+	// ---- Equipe ----
+	static constexpr int32 MaxStaff = 5;
+	int32 GetWaiters() const { return Waiters; }
+	int32 GetCleaners() const { return Cleaners; }
+	int32 GetHireCost(bool bWaiter) const { return bWaiter ? 300 : 250; }
+	int32 GetSalary(bool bWaiter) const { return bWaiter ? 25 : 20; }
+	bool TryHire(bool bWaiter);
+	void SetStaff(int32 InWaiters, int32 InCleaners);
+	/** Garcons aumentam a renda de comida, hospedagem e spa. */
+	float GetServiceMultiplier(const FBuildingDef& Building) const;
+	/** Faxineiros aumentam a satisfacao de cada visita. */
+	float GetCleanBonus() const { return 0.012f * Cleaners; }
+
 	// ---- Relogio ----
 	int32 GetDay() const { return Day; }
 	float GetDayFraction() const { return DayLengthSeconds > 0.f ? DayClock / DayLengthSeconds : 0.f; }
@@ -95,6 +108,8 @@ private:
 	float TodayEarned = 0.f;
 	int32 Day = 1;
 	int32 GuestCount = 0;
+	int32 Waiters = 0;
+	int32 Cleaners = 0;
 	int32 LastTier = 1;
 
 	float DayClock = 0.f;

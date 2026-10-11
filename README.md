@@ -34,6 +34,9 @@ Se algo falhar na compilação, copie a mensagem de erro e me mande.
 | X | demole a construção na mira (devolve 50%) |
 | F5 / F9 | salva / carrega o jogo (também salva sozinho a cada dia) |
 | F7 | novo jogo (apaga o save) |
+| 1-4 | compra melhoria da construção na mira |
+| F2 / F3 | contrata garçom / faxineiro |
+| P | pausa |
 
 O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde parou.
 
@@ -47,6 +50,9 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
   uma parte do valor da construção, aumenta a renda (nos quartos, a diária), a satisfação e a
   manutenção. Uma esfera dourada no telhado marca cada melhoria. Os dados ficam em
   `Content/Data/Upgrades.json`.
+- **Equipe:** garçons (+6% de renda em comida, hospedagem e spa) e faxineiros (+satisfação por visita),
+  até 5 de cada, com salário diário.
+- **Estrelas:** cada melhoria sobe a construção em 1 estrela (até 5); hóspedes ricos preferem as de mais estrelas.
 - **Prestígio** sobe o **nível** do resort e libera novas construções e hóspedes mais ricos:
   1 Quiosque → 2 Barraca de Praia → 3 Beach Club → 4 Pousada → 5 Resort.
 - Cada construção tem **manutenção diária**. Sem dinheiro para pagar, o prestígio cai.
