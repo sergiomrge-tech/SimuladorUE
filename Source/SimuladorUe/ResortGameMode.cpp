@@ -524,16 +524,17 @@ void AResortGameMode::BuildSandDetail()
 	}
 }
 
-float AResortGameMode::PlotHalfYForTier(int32 Tier)
+float AResortGameMode::PlotHalfYForLevel(int32 Level)
 {
-	static const float Halves[5] = { 900.f, 1500.f, 2100.f, 2600.f, 3000.f };
-	return Halves[FMath::Clamp(Tier, 1, 5) - 1];
+	// O terreno cresce a cada nivel: de 18 m de largura (nivel 1) ate 60 m (nivel 20)
+	const float Fraction = static_cast<float>(FMath::Clamp(Level, 1, 20) - 1) / 19.f;
+	return 900.f + 2100.f * Fraction;
 }
 
 float AResortGameMode::GetPlotHalfY(const UObject* WorldContext)
 {
 	const UResortEconomy* Eco = GetEconomy(WorldContext);
-	return PlotHalfYForTier(Eco != nullptr ? Eco->GetTier() : 1);
+	return PlotHalfYForLevel(Eco != nullptr ? Eco->GetLevel() : 1);
 }
 
 void AResortGameMode::UpdatePlot(bool bAnnounce)
@@ -542,13 +543,13 @@ void AResortGameMode::UpdatePlot(bool bAnnounce)
 	{
 		return;
 	}
-	const int32 Tier = Economy->GetTier();
-	if (Tier == PlotTier)
+	const int32 Level = Economy->GetLevel();
+	if (Level == PlotTier)
 	{
 		return;
 	}
-	PlotTier = Tier;
-	const float Half = PlotHalfYForTier(Tier);
+	PlotTier = Level;
+	const float Half = PlotHalfYForLevel(Level);
 	const float Thickness = 40.f;
 	if (AStaticMeshActor* A = WallLeft.Get())
 	{
@@ -786,12 +787,12 @@ void AResortGameMode::SpawnGuest()
 	}
 
 	// Sorteia o tipo de hospede entre os liberados no nivel atual
-	const int32 Tier = Economy->GetTier();
+	const int32 Level = Economy->GetLevel();
 	TArray<const FGuestDef*> Pool;
 	float Total = 0.f;
 	for (const FGuestDef& D : Economy->GetGuestDefs())
 	{
-		if (D.MinTier <= Tier)
+		if (D.MinLevel <= Level)
 		{
 			Pool.Add(&D);
 			Total += D.Weight;
@@ -908,7 +909,7 @@ void AResortGameMode::Tick(float DeltaSeconds)
 
 	// Chegada de hospedes: mais construcoes e prestigio atraem mais gente
 	const int32 BuildingCount = Economy->GetBuildingCount();
-	const int32 MaxGuests = FMath::Min(8 + 3 * BuildingCount, 60);
+	const int32 MaxGuests = FMath::Min(8 + 3 * BuildingCount, 20 + 5 * Economy->GetLevel());
 	if (Economy->GetGuestCount() < MaxGuests)
 	{
 		const float Interval = FMath::Clamp(14.f / (1.f + 0.35f * BuildingCount + Economy->GetPrestige() / 300.f), 2.f, 14.f) / Economy->GetSpawnMultiplier();

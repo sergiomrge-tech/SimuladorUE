@@ -96,7 +96,7 @@ void ResortData::LoadBuildings(TArray<FBuildingDef>& Out)
 			}
 			D.DisplayName = GetString(Obj, TEXT("DisplayName"), D.Id);
 			D.Category = GetString(Obj, TEXT("Category"), TEXT("shade"));
-			D.Tier = FMath::Max(1, FMath::RoundToInt(GetNumber(Obj, TEXT("Tier"), 1.f)));
+			D.MinLevel = FMath::Max(1, FMath::RoundToInt(GetNumber(Obj, TEXT("MinLevel"), 1.f)));
 			D.Cost = FMath::Max(0, FMath::RoundToInt(GetNumber(Obj, TEXT("Cost"), 100.f)));
 			D.IncomePerVisit = GetNumber(Obj, TEXT("IncomePerVisit"), 10.f);
 			D.ServiceSeconds = FMath::Max(0.5f, GetNumber(Obj, TEXT("ServiceSeconds"), 5.f));
@@ -133,7 +133,7 @@ void ResortData::LoadBuildings(TArray<FBuildingDef>& Out)
 		Kiosk.Id = TEXT("kiosk");
 		Kiosk.DisplayName = TEXT("Quiosque");
 		Kiosk.Category = TEXT("food");
-		Kiosk.Tier = 1;
+		Kiosk.MinLevel = 1;
 		Kiosk.Cost = 700;
 		Kiosk.IncomePerVisit = 14.f;
 		Kiosk.ServiceSeconds = 4.f;
@@ -148,7 +148,7 @@ void ResortData::LoadBuildings(TArray<FBuildingDef>& Out)
 		Umbrella.Id = TEXT("umbrella");
 		Umbrella.DisplayName = TEXT("Guarda-sol");
 		Umbrella.Category = TEXT("shade");
-		Umbrella.Tier = 1;
+		Umbrella.MinLevel = 1;
 		Umbrella.Cost = 120;
 		Umbrella.IncomePerVisit = 4.f;
 		Umbrella.ServiceSeconds = 14.f;
@@ -183,7 +183,7 @@ void ResortData::LoadGuests(TArray<FGuestDef>& Out)
 				continue;
 			}
 			D.DisplayName = GetString(Obj, TEXT("DisplayName"), D.Id);
-			D.MinTier = FMath::Max(1, FMath::RoundToInt(GetNumber(Obj, TEXT("MinTier"), 1.f)));
+			D.MinLevel = FMath::Max(1, FMath::RoundToInt(GetNumber(Obj, TEXT("MinLevel"), 1.f)));
 			D.BudgetMin = GetNumber(Obj, TEXT("BudgetMin"), 50.f);
 			D.BudgetMax = FMath::Max(D.BudgetMin, GetNumber(Obj, TEXT("BudgetMax"), 100.f));
 			D.WalkSpeed = GetNumber(Obj, TEXT("WalkSpeed"), 220.f);
@@ -207,7 +207,7 @@ void ResortData::LoadGuests(TArray<FGuestDef>& Out)
 		FGuestDef Tourist;
 		Tourist.Id = TEXT("turista");
 		Tourist.DisplayName = TEXT("Turista");
-		Tourist.MinTier = 1;
+		Tourist.MinLevel = 1;
 		Tourist.BudgetMin = 40.f;
 		Tourist.BudgetMax = 110.f;
 		Tourist.PreferredCategory = TEXT("shade");

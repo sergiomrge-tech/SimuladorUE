@@ -3,7 +3,7 @@
     {
       "Id": "turista",
       "DisplayName": "Turista",
-      "MinTier": 1,
+      "MinLevel": 1,
       "BudgetMin": 40,
       "BudgetMax": 110,
       "WalkSpeed": 220,
@@ -18,9 +18,26 @@
       ]
     },
     {
+      "Id": "mochileiro",
+      "DisplayName": "Mochileiro",
+      "MinLevel": 1,
+      "BudgetMin": 20,
+      "BudgetMax": 60,
+      "WalkSpeed": 230,
+      "MinVisits": 1,
+      "MaxVisits": 2,
+      "Weight": 4,
+      "PreferredCategory": "food",
+      "ShirtColor": [
+        0.35,
+        0.65,
+        0.35
+      ]
+    },
+    {
       "Id": "familia",
       "DisplayName": "Fam\u00edlia",
-      "MinTier": 2,
+      "MinLevel": 5,
       "BudgetMin": 90,
       "BudgetMax": 260,
       "WalkSpeed": 200,
@@ -37,7 +54,7 @@
     {
       "Id": "amigos",
       "DisplayName": "Grupo de Amigos",
-      "MinTier": 2,
+      "MinLevel": 5,
       "BudgetMin": 60,
       "BudgetMax": 200,
       "WalkSpeed": 240,
@@ -52,9 +69,26 @@
       ]
     },
     {
+      "Id": "influencer",
+      "DisplayName": "Influenciador",
+      "MinLevel": 8,
+      "BudgetMin": 200,
+      "BudgetMax": 700,
+      "WalkSpeed": 240,
+      "MinVisits": 3,
+      "MaxVisits": 5,
+      "Weight": 2,
+      "PreferredCategory": "entertainment",
+      "ShirtColor": [
+        0.95,
+        0.45,
+        0.7
+      ]
+    },
+    {
       "Id": "casal",
       "DisplayName": "Casal",
-      "MinTier": 3,
+      "MinLevel": 9,
       "BudgetMin": 150,
       "BudgetMax": 500,
       "WalkSpeed": 190,
@@ -71,7 +105,7 @@
     {
       "Id": "vip",
       "DisplayName": "H\u00f3spede VIP",
-      "MinTier": 4,
+      "MinLevel": 13,
       "BudgetMin": 400,
       "BudgetMax": 1500,
       "WalkSpeed": 180,
@@ -86,26 +120,9 @@
       ]
     },
     {
-      "Id": "mochileiro",
-      "DisplayName": "Mochileiro",
-      "MinTier": 1,
-      "BudgetMin": 20,
-      "BudgetMax": 60,
-      "WalkSpeed": 230,
-      "MinVisits": 1,
-      "MaxVisits": 2,
-      "Weight": 4,
-      "PreferredCategory": "food",
-      "ShirtColor": [
-        0.35,
-        0.65,
-        0.35
-      ]
-    },
-    {
       "Id": "celebridade",
       "DisplayName": "Celebridade",
-      "MinTier": 5,
+      "MinLevel": 18,
       "BudgetMin": 1500,
       "BudgetMax": 5000,
       "WalkSpeed": 170,

@@ -46,7 +46,14 @@ public:
 	void AddPrestige(float Amount);
 	float GetTodayEarned() const { return TodayEarned; }
 
-	// ---- Nivel do resort (1 = Quiosque ... 5 = Resort) ----
+	// ---- 20 niveis de evolucao (1 = Quiosque Simples ... 20 = Resort Lendario) ----
+	static constexpr int32 MaxLevel = 20;
+	int32 GetLevel() const;
+	FString GetLevelName(int32 Level) const;
+	/** Prestigio necessario para o proximo grupo de construcoes (proxima fase), ou -1 no maximo. */
+	float GetNextUnlockPrestige() const;
+
+	// ---- Fase do resort (1 = Quiosque ... 5 = Resort): libera construcoes e hospedes; muda a cada 4 niveis ----
 	int32 GetTier() const;
 	static int32 GetMaxTier() { return 5; }
 	FString GetTierName(int32 Tier) const;
@@ -146,6 +153,7 @@ private:
 	int32 Waiters = 0;
 	int32 Cleaners = 0;
 	int32 LastTier = 1;
+	int32 LastLevel = 1;
 
 	float DayClock = 0.f;
 	/** Duracao de um dia de jogo em segundos reais. */

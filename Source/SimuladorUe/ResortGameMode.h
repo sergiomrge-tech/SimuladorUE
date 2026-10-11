@@ -38,7 +38,7 @@ public:
 	void NewResort();
 
 	/** Meia-largura (cm) do terreno liberado em cada nivel do resort: o terreno cresce com o nivel. */
-	static float PlotHalfYForTier(int32 Tier);
+	static float PlotHalfYForLevel(int32 Level);
 	static float GetPlotHalfY(const UObject* WorldContext);
 
 	/** Acesso rapido a economia a partir de qualquer objeto do mundo. */

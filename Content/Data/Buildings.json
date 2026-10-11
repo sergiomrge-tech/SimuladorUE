@@ -4,7 +4,7 @@
       "Id": "kiosk",
       "DisplayName": "Quiosque",
       "Category": "food",
-      "Tier": 1,
+      "MinLevel": 1,
       "Cost": 700,
       "IncomePerVisit": 14,
       "ServiceSeconds": 4,
@@ -26,7 +26,7 @@
       "Id": "umbrella",
       "DisplayName": "Guarda-sol com Mesa",
       "Category": "shade",
-      "Tier": 1,
+      "MinLevel": 1,
       "Cost": 120,
       "IncomePerVisit": 4,
       "ServiceSeconds": 14,
@@ -48,7 +48,7 @@
       "Id": "lounger",
       "DisplayName": "Espregui\u00e7adeira",
       "Category": "shade",
-      "Tier": 1,
+      "MinLevel": 1,
       "Cost": 90,
       "IncomePerVisit": 6,
       "ServiceSeconds": 20,
@@ -67,164 +67,10 @@
       ]
     },
     {
-      "Id": "beach_bar",
-      "DisplayName": "Bar de Praia",
-      "Category": "food",
-      "Tier": 2,
-      "Cost": 1400,
-      "IncomePerVisit": 26,
-      "ServiceSeconds": 5,
-      "Capacity": 4,
-      "Satisfaction": 0.15,
-      "UpkeepPerDay": 18,
-      "Size": [
-        420,
-        300,
-        280
-      ],
-      "Color": [
-        0.2,
-        0.62,
-        0.7
-      ]
-    },
-    {
-      "Id": "volley",
-      "DisplayName": "Quadra de V\u00f4lei",
-      "Category": "entertainment",
-      "Tier": 2,
-      "Cost": 1800,
-      "IncomePerVisit": 9,
-      "ServiceSeconds": 18,
-      "Capacity": 6,
-      "Satisfaction": 0.22,
-      "UpkeepPerDay": 6,
-      "Size": [
-        900,
-        500,
-        230
-      ],
-      "Color": [
-        0.95,
-        0.88,
-        0.7
-      ]
-    },
-    {
-      "Id": "pool",
-      "DisplayName": "Piscina",
-      "Category": "entertainment",
-      "Tier": 3,
-      "Cost": 4800,
-      "IncomePerVisit": 16,
-      "ServiceSeconds": 20,
-      "Capacity": 10,
-      "Satisfaction": 0.25,
-      "UpkeepPerDay": 25,
-      "Size": [
-        700,
-        450,
-        40
-      ],
-      "Color": [
-        0.05,
-        0.55,
-        0.75
-      ]
-    },
-    {
-      "Id": "restaurant",
-      "DisplayName": "Restaurante",
-      "Category": "food",
-      "Tier": 3,
-      "Cost": 6500,
-      "IncomePerVisit": 48,
-      "ServiceSeconds": 9,
-      "Capacity": 12,
-      "Satisfaction": 0.22,
-      "UpkeepPerDay": 45,
-      "Size": [
-        800,
-        600,
-        320
-      ],
-      "Color": [
-        0.9,
-        0.82,
-        0.65
-      ]
-    },
-    {
-      "Id": "cabin",
-      "DisplayName": "Chal\u00e9",
-      "Category": "lodging",
-      "Tier": 4,
-      "Cost": 9500,
-      "IncomePerVisit": 140,
-      "ServiceSeconds": 25,
-      "Capacity": 2,
-      "Satisfaction": 0.3,
-      "UpkeepPerDay": 40,
-      "Size": [
-        450,
-        400,
-        320
-      ],
-      "Color": [
-        0.7,
-        0.5,
-        0.32
-      ]
-    },
-    {
-      "Id": "spa",
-      "DisplayName": "Spa",
-      "Category": "wellness",
-      "Tier": 4,
-      "Cost": 14000,
-      "IncomePerVisit": 90,
-      "ServiceSeconds": 18,
-      "Capacity": 4,
-      "Satisfaction": 0.3,
-      "UpkeepPerDay": 70,
-      "Size": [
-        700,
-        600,
-        320
-      ],
-      "Color": [
-        0.75,
-        0.85,
-        0.8
-      ]
-    },
-    {
-      "Id": "hotel",
-      "DisplayName": "Bloco do Resort",
-      "Category": "lodging",
-      "Tier": 5,
-      "Cost": 42000,
-      "IncomePerVisit": 420,
-      "ServiceSeconds": 30,
-      "Capacity": 20,
-      "Satisfaction": 0.4,
-      "UpkeepPerDay": 220,
-      "Size": [
-        1400,
-        700,
-        900
-      ],
-      "Color": [
-        0.96,
-        0.93,
-        0.86
-      ]
-    },
-    {
       "Id": "ice_cream",
       "DisplayName": "Sorveteria",
       "Category": "food",
-      "Tier": 2,
+      "MinLevel": 2,
       "Cost": 900,
       "IncomePerVisit": 11,
       "ServiceSeconds": 3,
@@ -243,11 +89,55 @@
       ]
     },
     {
+      "Id": "volley",
+      "DisplayName": "Quadra de V\u00f4lei",
+      "Category": "entertainment",
+      "MinLevel": 3,
+      "Cost": 1800,
+      "IncomePerVisit": 9,
+      "ServiceSeconds": 18,
+      "Capacity": 6,
+      "Satisfaction": 0.22,
+      "UpkeepPerDay": 6,
+      "Size": [
+        900,
+        500,
+        230
+      ],
+      "Color": [
+        0.95,
+        0.88,
+        0.7
+      ]
+    },
+    {
+      "Id": "beach_bar",
+      "DisplayName": "Bar de Praia",
+      "Category": "food",
+      "MinLevel": 4,
+      "Cost": 2200,
+      "IncomePerVisit": 26,
+      "ServiceSeconds": 5,
+      "Capacity": 4,
+      "Satisfaction": 0.15,
+      "UpkeepPerDay": 18,
+      "Size": [
+        420,
+        300,
+        280
+      ],
+      "Color": [
+        0.2,
+        0.62,
+        0.7
+      ]
+    },
+    {
       "Id": "massage",
       "DisplayName": "Tenda de Massagem",
       "Category": "wellness",
-      "Tier": 2,
-      "Cost": 1600,
+      "MinLevel": 5,
+      "Cost": 3200,
       "IncomePerVisit": 30,
       "ServiceSeconds": 14,
       "Capacity": 2,
@@ -265,16 +155,104 @@
       ]
     },
     {
+      "Id": "shower",
+      "DisplayName": "Chuveir\u00e3o e Vesti\u00e1rio",
+      "Category": "shade",
+      "MinLevel": 6,
+      "Cost": 3800,
+      "IncomePerVisit": 8,
+      "ServiceSeconds": 6,
+      "Capacity": 6,
+      "Satisfaction": 0.18,
+      "UpkeepPerDay": 12,
+      "Size": [
+        300,
+        250,
+        260
+      ],
+      "Color": [
+        0.6,
+        0.72,
+        0.8
+      ]
+    },
+    {
+      "Id": "surf",
+      "DisplayName": "Escola de Surf",
+      "Category": "entertainment",
+      "MinLevel": 7,
+      "Cost": 6500,
+      "IncomePerVisit": 45,
+      "ServiceSeconds": 22,
+      "Capacity": 5,
+      "Satisfaction": 0.28,
+      "UpkeepPerDay": 30,
+      "Size": [
+        450,
+        300,
+        220
+      ],
+      "Color": [
+        0.15,
+        0.65,
+        0.65
+      ]
+    },
+    {
+      "Id": "pool",
+      "DisplayName": "Piscina",
+      "Category": "entertainment",
+      "MinLevel": 8,
+      "Cost": 9000,
+      "IncomePerVisit": 24,
+      "ServiceSeconds": 20,
+      "Capacity": 10,
+      "Satisfaction": 0.25,
+      "UpkeepPerDay": 40,
+      "Size": [
+        700,
+        450,
+        40
+      ],
+      "Color": [
+        0.05,
+        0.55,
+        0.75
+      ]
+    },
+    {
+      "Id": "restaurant",
+      "DisplayName": "Restaurante",
+      "Category": "food",
+      "MinLevel": 9,
+      "Cost": 14000,
+      "IncomePerVisit": 60,
+      "ServiceSeconds": 9,
+      "Capacity": 12,
+      "Satisfaction": 0.22,
+      "UpkeepPerDay": 70,
+      "Size": [
+        800,
+        600,
+        320
+      ],
+      "Color": [
+        0.9,
+        0.82,
+        0.65
+      ]
+    },
+    {
       "Id": "jet_ski",
       "DisplayName": "Aluguel de Jet Ski",
       "Category": "entertainment",
-      "Tier": 3,
-      "Cost": 3600,
-      "IncomePerVisit": 70,
+      "MinLevel": 10,
+      "Cost": 20000,
+      "IncomePerVisit": 90,
       "ServiceSeconds": 22,
       "Capacity": 4,
       "Satisfaction": 0.3,
-      "UpkeepPerDay": 22,
+      "UpkeepPerDay": 60,
       "Size": [
         500,
         350,
@@ -287,16 +265,82 @@
       ]
     },
     {
+      "Id": "cabin",
+      "DisplayName": "Chal\u00e9",
+      "Category": "lodging",
+      "MinLevel": 11,
+      "Cost": 30000,
+      "IncomePerVisit": 170,
+      "ServiceSeconds": 25,
+      "Capacity": 2,
+      "Satisfaction": 0.3,
+      "UpkeepPerDay": 90,
+      "Size": [
+        450,
+        400,
+        320
+      ],
+      "Color": [
+        0.7,
+        0.5,
+        0.32
+      ]
+    },
+    {
+      "Id": "spa",
+      "DisplayName": "Spa",
+      "Category": "wellness",
+      "MinLevel": 12,
+      "Cost": 45000,
+      "IncomePerVisit": 120,
+      "ServiceSeconds": 18,
+      "Capacity": 4,
+      "Satisfaction": 0.3,
+      "UpkeepPerDay": 130,
+      "Size": [
+        700,
+        600,
+        320
+      ],
+      "Color": [
+        0.75,
+        0.85,
+        0.8
+      ]
+    },
+    {
+      "Id": "pizzeria",
+      "DisplayName": "Pizzaria",
+      "Category": "food",
+      "MinLevel": 13,
+      "Cost": 40000,
+      "IncomePerVisit": 80,
+      "ServiceSeconds": 8,
+      "Capacity": 14,
+      "Satisfaction": 0.22,
+      "UpkeepPerDay": 110,
+      "Size": [
+        700,
+        500,
+        300
+      ],
+      "Color": [
+        0.85,
+        0.4,
+        0.25
+      ]
+    },
+    {
       "Id": "gym",
       "DisplayName": "Academia",
       "Category": "wellness",
-      "Tier": 4,
-      "Cost": 8000,
-      "IncomePerVisit": 55,
+      "MinLevel": 14,
+      "Cost": 70000,
+      "IncomePerVisit": 70,
       "ServiceSeconds": 20,
       "Capacity": 6,
       "Satisfaction": 0.25,
-      "UpkeepPerDay": 50,
+      "UpkeepPerDay": 150,
       "Size": [
         800,
         500,
@@ -309,16 +353,82 @@
       ]
     },
     {
+      "Id": "tennis",
+      "DisplayName": "Quadra de T\u00eanis",
+      "Category": "entertainment",
+      "MinLevel": 15,
+      "Cost": 90000,
+      "IncomePerVisit": 95,
+      "ServiceSeconds": 24,
+      "Capacity": 4,
+      "Satisfaction": 0.32,
+      "UpkeepPerDay": 140,
+      "Size": [
+        1100,
+        600,
+        60
+      ],
+      "Color": [
+        0.3,
+        0.6,
+        0.35
+      ]
+    },
+    {
+      "Id": "hotel",
+      "DisplayName": "Bloco do Resort",
+      "Category": "lodging",
+      "MinLevel": 16,
+      "Cost": 220000,
+      "IncomePerVisit": 520,
+      "ServiceSeconds": 30,
+      "Capacity": 20,
+      "Satisfaction": 0.4,
+      "UpkeepPerDay": 500,
+      "Size": [
+        1400,
+        700,
+        900
+      ],
+      "Color": [
+        0.96,
+        0.93,
+        0.86
+      ]
+    },
+    {
+      "Id": "pool_bar",
+      "DisplayName": "Bar da Piscina",
+      "Category": "food",
+      "MinLevel": 17,
+      "Cost": 150000,
+      "IncomePerVisit": 110,
+      "ServiceSeconds": 6,
+      "Capacity": 8,
+      "Satisfaction": 0.25,
+      "UpkeepPerDay": 220,
+      "Size": [
+        600,
+        450,
+        300
+      ],
+      "Color": [
+        0.25,
+        0.7,
+        0.75
+      ]
+    },
+    {
       "Id": "suite",
       "DisplayName": "Su\u00edte Presidencial",
       "Category": "lodging",
-      "Tier": 5,
-      "Cost": 30000,
-      "IncomePerVisit": 600,
+      "MinLevel": 18,
+      "Cost": 450000,
+      "IncomePerVisit": 800,
       "ServiceSeconds": 30,
       "Capacity": 2,
       "Satisfaction": 0.5,
-      "UpkeepPerDay": 160,
+      "UpkeepPerDay": 400,
       "Size": [
         1000,
         800,
@@ -328,6 +438,50 @@
         0.97,
         0.94,
         0.88
+      ]
+    },
+    {
+      "Id": "marina",
+      "DisplayName": "Marina e Iate Clube",
+      "Category": "entertainment",
+      "MinLevel": 19,
+      "Cost": 900000,
+      "IncomePerVisit": 300,
+      "ServiceSeconds": 28,
+      "Capacity": 8,
+      "Satisfaction": 0.45,
+      "UpkeepPerDay": 700,
+      "Size": [
+        1600,
+        900,
+        500
+      ],
+      "Color": [
+        0.9,
+        0.92,
+        0.95
+      ]
+    },
+    {
+      "Id": "stage",
+      "DisplayName": "Palco de Shows",
+      "Category": "entertainment",
+      "MinLevel": 20,
+      "Cost": 1500000,
+      "IncomePerVisit": 400,
+      "ServiceSeconds": 35,
+      "Capacity": 30,
+      "Satisfaction": 0.5,
+      "UpkeepPerDay": 1000,
+      "Size": [
+        1500,
+        1000,
+        500
+      ],
+      "Color": [
+        0.55,
+        0.25,
+        0.6
       ]
     }
   ]

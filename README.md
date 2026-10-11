@@ -59,15 +59,18 @@ O save fica em `Saved/resort_save.json`. Ao abrir o jogo, ele continua de onde p
 - **Equipe:** garçons (+6% de renda em comida, hospedagem e spa) e faxineiros (+satisfação por visita),
   até 5 de cada, com salário diário.
 - **Terreno:** começa pequeno (18 m de largura) e a praia é ampliada a cada novo nível do resort
-  (até 60 m). Uma cerca branca marca o limite.
+  (até 60 m, crescendo a cada um dos 20 níveis). Uma cerca branca marca o limite.
 - **Quiosque que evolui:** cada melhoria acrescenta algo ao quiosque (placa, mesas, deck, pérgola com
   luzes) e o nome muda: Quiosque, Quiosque Reformado, Bar do Quiosque, Beach Bar, Restaurante Beira-Mar.
 - **Quartos individuais:** chalés e hotel têm cada quarto com nível próprio (0 a 3); os hóspedes ocupam
   primeiro os melhores. **Preço:** -/+ muda o preço de qualquer construção (caro rende mais, mas cansa o
   hóspede). Lojas de comida gastam 25% da venda em produtos.
 - **Estrelas:** cada melhoria sobe a construção em 1 estrela (até 5); hóspedes ricos preferem as de mais estrelas.
-- **Prestígio** sobe o **nível** do resort e libera novas construções e hóspedes mais ricos:
-  1 Quiosque → 2 Barraca de Praia → 3 Beach Club → 4 Pousada → 5 Resort.
+- **Prestígio** sobe o **nível** do resort (**20 níveis**, do Quiosque Simples ao Resort Lendário). Cada
+  nível libera novas construções (22 no total) e hóspedes mais ricos, e dá bônus em dinheiro. A cada 4
+  níveis muda a fase (visual do cenário). Há 31 missões encadeadas.
+- **Campanha longa:** um jogador perfeito chega ao nível 20 por volta do dia 330 (~22 h); um jogador
+  normal deve levar 30 h ou mais. Ajuste com `python3 Tools/simular_balanceamento.py 360 1`.
 - Cada construção tem **manutenção diária**. Sem dinheiro para pagar, o prestígio cai.
 - O dia dura 4 minutos reais (das 8h às 20h) e o sol se move no céu.
 

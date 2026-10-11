@@ -16,20 +16,52 @@ namespace
 		{ TEXT("Tenha 3 construções"), 0, 3, 150 },
 		{ TEXT("Atenda 10 hóspedes"), 3, 10, 200 },
 		{ TEXT("Instale 2 melhorias (olhe para uma construção e aperte 1-4)"), 5, 2, 300 },
-		{ TEXT("Chegue ao nível 2: Barraca de Praia"), 4, 2, 500 },
-		{ TEXT("Tenha 8 construções"), 0, 8, 600 },
-		{ TEXT("Atenda 100 hóspedes"), 3, 100, 800 },
+		{ TEXT("Chegue ao nível 3"), 6, 3, 400 },
+		{ TEXT("Tenha 6 construções"), 0, 6, 500 },
+		{ TEXT("Atenda 50 hóspedes"), 3, 50, 600 },
+		{ TEXT("Chegue ao nível 5: Barraca de Praia"), 6, 5, 1000 },
 		{ TEXT("Junte R$ 5.000"), 2, 5000, 1000 },
-		{ TEXT("Chegue ao nível 3: Beach Club"), 4, 3, 1500 },
-		{ TEXT("Instale 10 melhorias"), 5, 10, 2000 },
-		{ TEXT("Chegue ao nível 4: Pousada"), 4, 4, 4000 },
-		{ TEXT("Atenda 1.000 hóspedes"), 3, 1000, 5000 },
-		{ TEXT("Chegue ao nível 5: Resort"), 4, 5, 20000 },
+		{ TEXT("Tenha 10 construções"), 0, 10, 1500 },
+		{ TEXT("Instale 8 melhorias"), 5, 8, 2000 },
+		{ TEXT("Atenda 250 hóspedes"), 3, 250, 2500 },
+		{ TEXT("Chegue ao nível 7"), 6, 7, 3000 },
+		{ TEXT("Chegue ao nível 9: Beach Club"), 6, 9, 6000 },
+		{ TEXT("Tenha 16 construções"), 0, 16, 6000 },
+		{ TEXT("Junte R$ 50.000"), 2, 50000, 8000 },
+		{ TEXT("Atenda 1.000 hóspedes"), 3, 1000, 10000 },
+		{ TEXT("Instale 20 melhorias"), 5, 20, 12000 },
+		{ TEXT("Chegue ao nível 11"), 6, 11, 15000 },
+		{ TEXT("Chegue ao nível 13: Pousada"), 6, 13, 25000 },
+		{ TEXT("Tenha 24 construções"), 0, 24, 25000 },
+		{ TEXT("Atenda 3.000 hóspedes"), 3, 3000, 30000 },
+		{ TEXT("Instale 40 melhorias"), 5, 40, 40000 },
+		{ TEXT("Chegue ao nível 15"), 6, 15, 50000 },
+		{ TEXT("Junte R$ 500.000"), 2, 500000, 60000 },
+		{ TEXT("Chegue ao nível 17: Resort"), 6, 17, 100000 },
+		{ TEXT("Tenha 34 construções"), 0, 34, 100000 },
+		{ TEXT("Atenda 8.000 hóspedes"), 3, 8000, 120000 },
+		{ TEXT("Instale 70 melhorias"), 5, 70, 150000 },
+		{ TEXT("Chegue ao nível 19"), 6, 19, 250000 },
+		{ TEXT("Atenda 15.000 hóspedes"), 3, 15000, 300000 },
+		{ TEXT("Chegue ao nível 20: Resort Lendário"), 6, 20, 1000000 },
 	};
 	constexpr int32 MissionCount = UE_ARRAY_COUNT(Missions);
 
 	// Prestigio necessario para cada nivel (indice 0 = nivel 1).
-	const float TierThreshold[5] = { 0.f, 60.f, 250.f, 800.f, 2000.f };
+	// Prestigio para cada um dos 20 niveis (indice 0 = nivel 1). Os niveis 5, 9, 13 e 17 abrem novas
+	// fases (construcoes e hospedes); os demais dao premios em dinheiro.
+	const float LevelThreshold[20] = {
+		0.f, 25.f, 96.f, 243.f, 435.f,
+		725.f, 1050.f, 1395.f, 1757.f, 2176.f,
+		2602.f, 3076.f, 3526.f, 4029.f, 4532.f,
+		5059.f, 5588.f, 6141.f, 6730.f, 7317.f };
+
+	const TCHAR* LevelNames[20] = {
+		TEXT("Quiosque Simples"), TEXT("Quiosque Movimentado"), TEXT("Quiosque Popular"), TEXT("Ponto da Praia"),
+		TEXT("Barraca de Praia"), TEXT("Barraca Animada"), TEXT("Barraca Premium"), TEXT("Bar da Praia"),
+		TEXT("Beach Club"), TEXT("Beach Club Animado"), TEXT("Clube de Praia"), TEXT("Clube Exclusivo"),
+		TEXT("Pousada"), TEXT("Pousada Charmosa"), TEXT("Pousada Boutique"), TEXT("Hotel Boutique"),
+		TEXT("Resort"), TEXT("Resort Cinco Estrelas"), TEXT("Resort de Luxo"), TEXT("Resort Lendário") };
 }
 
 void UResortEconomy::Initialize()
@@ -52,6 +84,7 @@ void UResortEconomy::Initialize()
 	GuestsServed = 0;
 	CurrentEvent = EResortEvent::None;
 	LastTier = 1;
+	LastLevel = 1;
 	DayClock = 0.f;
 
 	UE_LOG(LogResort, Log, TEXT("Economia iniciada: %d construcoes, %d tipos de hospede"), BuildingDefs.Num(), GuestDefs.Num());
@@ -82,13 +115,37 @@ void UResortEconomy::Tick(float DeltaSeconds)
 		CheckMission();
 	}
 
+	const int32 NowLevel = GetLevel();
+	if (NowLevel > LastLevel)
+	{
+		LastLevel = NowLevel;
+		const int32 Bonus = NowLevel * NowLevel * 50;
+		AddMoney(static_cast<float>(Bonus));
+		PushNotification(
+			FString::Printf(TEXT("Nível %d: %s! (+R$ %d)"), NowLevel, *GetLevelName(NowLevel), Bonus),
+			FLinearColor(1.f, 0.85f, 0.2f));
+		for (const FBuildingDef& D : BuildingDefs)
+		{
+			if (D.MinLevel == NowLevel)
+			{
+				PushNotification(FString::Printf(TEXT("Desbloqueado: %s"), *D.DisplayName), FLinearColor(0.6f, 1.f, 0.9f));
+			}
+		}
+		for (const FGuestDef& G : GuestDefs)
+		{
+			if (G.MinLevel == NowLevel)
+			{
+				PushNotification(FString::Printf(TEXT("Novo tipo de hóspede: %s"), *G.DisplayName), FLinearColor(0.9f, 0.8f, 1.f));
+			}
+		}
+	}
 	const int32 NowTier = GetTier();
 	if (NowTier > LastTier)
 	{
 		LastTier = NowTier;
 		PushNotification(
-			FString::Printf(TEXT("Novo nível: %s! Novas construções liberadas."), *GetTierName(NowTier)),
-			FLinearColor(1.f, 0.85f, 0.2f));
+			FString::Printf(TEXT("Nova fase: %s! Novas construções e hóspedes liberados."), *GetTierName(NowTier)),
+			FLinearColor(0.6f, 1.f, 0.9f));
 	}
 }
 
@@ -116,17 +173,27 @@ void UResortEconomy::AddPrestige(float Amount)
 	Prestige = FMath::Max(0.f, Prestige + Amount);
 }
 
-int32 UResortEconomy::GetTier() const
+int32 UResortEconomy::GetLevel() const
 {
-	int32 Tier = 1;
-	for (int32 i = 1; i < 5; ++i)
+	int32 Level = 1;
+	for (int32 i = 1; i < MaxLevel; ++i)
 	{
-		if (Prestige >= TierThreshold[i])
+		if (Prestige >= LevelThreshold[i])
 		{
-			Tier = i + 1;
+			Level = i + 1;
 		}
 	}
-	return Tier;
+	return Level;
+}
+
+FString UResortEconomy::GetLevelName(int32 Level) const
+{
+	return LevelNames[FMath::Clamp(Level, 1, MaxLevel) - 1];
+}
+
+int32 UResortEconomy::GetTier() const
+{
+	return FMath::Clamp((GetLevel() - 1) / 4 + 1, 1, 5);
 }
 
 FString UResortEconomy::GetTierName(int32 Tier) const
@@ -143,13 +210,19 @@ FString UResortEconomy::GetTierName(int32 Tier) const
 
 float UResortEconomy::GetTierStartPrestige() const
 {
-	return TierThreshold[FMath::Clamp(GetTier() - 1, 0, 4)];
+	return LevelThreshold[GetLevel() - 1];
 }
 
 float UResortEconomy::GetNextTierPrestige() const
 {
+	const int32 Level = GetLevel();
+	return Level >= MaxLevel ? -1.f : LevelThreshold[Level];
+}
+
+float UResortEconomy::GetNextUnlockPrestige() const
+{
 	const int32 Tier = GetTier();
-	return Tier >= GetMaxTier() ? -1.f : TierThreshold[Tier];
+	return Tier >= GetMaxTier() ? -1.f : LevelThreshold[Tier * 4];
 }
 
 const FBuildingDef* UResortEconomy::FindBuildingDef(const FString& Id) const
@@ -192,10 +265,10 @@ TArray<const FUpgradeDef*> UResortEconomy::GetUpgradesFor(const FBuildingDef& Bu
 TArray<const FBuildingDef*> UResortEconomy::GetUnlockedBuildings() const
 {
 	TArray<const FBuildingDef*> Result;
-	const int32 Tier = GetTier();
+	const int32 Level = GetLevel();
 	for (const FBuildingDef& D : BuildingDefs)
 	{
-		if (D.Tier <= Tier)
+		if (D.MinLevel <= Level)
 		{
 			Result.Add(&D);
 		}
@@ -223,7 +296,7 @@ void UResortEconomy::OnGuestLeft(float Satisfaction)
 {
 	++GuestsServed;
 	// Satisfacao acima de 0.45 rende prestigio.
-	AddPrestige(FMath::Max(0.f, Satisfaction - 0.45f) * 1.f);
+	AddPrestige(FMath::Max(0.f, Satisfaction - 0.45f) * 0.25f);
 }
 
 void UResortEconomy::PushNotification(const FString& Text, const FLinearColor& Color)
@@ -318,6 +391,7 @@ void UResortEconomy::GetMissionProgress(int32& Current, int32& Target, int32& Re
 	case 2: Current = FMath::RoundToInt(Money); break;
 	case 3: Current = GuestsServed; break;
 	case 4: Current = GetTier(); break;
+	case 6: Current = GetLevel(); break;
 	default: Current = CountUpgrades(); break;
 	}
 }
@@ -386,6 +460,7 @@ void UResortEconomy::SetState(float InMoney, float InPrestige, int32 InDay, floa
 	DayClock = FMath::Clamp(InDayClock, 0.f, DayLengthSeconds);
 	TodayEarned = 0.f;
 	LastTier = GetTier();
+	LastLevel = GetLevel();
 }
 
 void UResortEconomy::EndDay()

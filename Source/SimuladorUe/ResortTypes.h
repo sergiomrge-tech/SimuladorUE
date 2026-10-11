@@ -13,8 +13,8 @@ struct FBuildingDef
 	FString DisplayName;
 	/** food, shade, entertainment, lodging, wellness */
 	FString Category;
-	/** Nivel do resort necessario para liberar (1 = quiosque ... 5 = resort). */
-	int32 Tier = 1;
+	/** Nivel do resort (1 a 20) em que a construcao e liberada. */
+	int32 MinLevel = 1;
 	int32 Cost = 100;
 	float IncomePerVisit = 10.f;
 	float ServiceSeconds = 5.f;
@@ -94,7 +94,7 @@ struct FGuestDef
 {
 	FString Id;
 	FString DisplayName;
-	int32 MinTier = 1;
+	int32 MinLevel = 1;
 	float BudgetMin = 50.f;
 	float BudgetMax = 100.f;
 	float WalkSpeed = 220.f;

@@ -35,7 +35,7 @@ void AResortHUD::DrawHUD()
 	DrawText(FString::Printf(TEXT("R$ %s"), *FText::AsNumber(FMath::RoundToInt(Economy->GetMoney())).ToString()),
 		Green, 36.f * S, 30.f * S, Large, 1.3f * S);
 
-	DrawText(FString::Printf(TEXT("Nível %d: %s"), Economy->GetTier(), *Economy->GetTierName(Economy->GetTier())),
+	DrawText(FString::Printf(TEXT("Nível %d/20: %s"), Economy->GetLevel(), *Economy->GetLevelName(Economy->GetLevel())),
 		Gold, 36.f * S, 82.f * S, Medium, 1.0f * S);
 
 	// Barra de prestigio
@@ -138,10 +138,10 @@ void AResortHUD::DrawHUD()
 			DrawText(TEXT("Pode construir aqui"), Green, PanelX + 16.f * S, Y + 10.f * S, Small, 1.0f * S);
 		}
 
-		const float Next = Economy->GetNextTierPrestige();
+		const float Next = Economy->GetNextUnlockPrestige();
 		if (Next > 0.f)
 		{
-			DrawText(FString::Printf(TEXT("Próximo nível (%s) com %d de prestígio"),
+			DrawText(FString::Printf(TEXT("Próximas construções (%s) com %d de prestígio"),
 				*Economy->GetTierName(Economy->GetTier() + 1), FMath::RoundToInt(Next)),
 				Dim, PanelX + 16.f * S, Y + 34.f * S, Small, 0.9f * S);
 		}
