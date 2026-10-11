@@ -27,6 +27,11 @@ BUILDINGS = [
     ("cabin", "Chalé", "lodging", 4, 9500, 140, 25, 2, 0.30, 40, (450, 400, 320), (0.70, 0.50, 0.32)),
     ("spa", "Spa", "wellness", 4, 14000, 90, 18, 4, 0.30, 70, (700, 600, 320), (0.75, 0.85, 0.80)),
     ("hotel", "Bloco do Resort", "lodging", 5, 42000, 420, 30, 20, 0.40, 220, (1400, 700, 900), (0.96, 0.93, 0.86)),
+    ("ice_cream", "Sorveteria", "food", 2, 900, 11, 3, 3, 0.10, 10, (220, 200, 230), (0.98, 0.72, 0.80)),
+    ("massage", "Tenda de Massagem", "wellness", 2, 1600, 30, 14, 2, 0.20, 14, (320, 300, 240), (0.90, 0.82, 0.68)),
+    ("jet_ski", "Aluguel de Jet Ski", "entertainment", 3, 3600, 70, 22, 4, 0.30, 22, (500, 350, 180), (0.95, 0.55, 0.15)),
+    ("gym", "Academia", "wellness", 4, 8000, 55, 20, 6, 0.25, 50, (800, 500, 320), (0.55, 0.60, 0.68)),
+    ("suite", "Suíte Presidencial", "lodging", 5, 30000, 600, 30, 2, 0.50, 160, (1000, 800, 420), (0.97, 0.94, 0.88)),
 ]
 
 # Modelos 3D finais (opcional). Depois de importar/baixar um asset na Unreal, aponte aqui:
@@ -93,6 +98,8 @@ GUESTS = [
     ("amigos", "Grupo de Amigos", 2, 60, 200, 240, 3, 5, 3, "food", (0.85, 0.25, 0.45)),
     ("casal", "Casal", 3, 150, 500, 190, 3, 4, 2, "wellness", (0.30, 0.75, 0.55)),
     ("vip", "Hóspede VIP", 4, 400, 1500, 180, 3, 5, 1, "lodging", (0.95, 0.85, 0.30)),
+    ("mochileiro", "Mochileiro", 1, 20, 60, 230, 1, 2, 4, "food", (0.35, 0.65, 0.35)),
+    ("celebridade", "Celebridade", 5, 1500, 5000, 170, 3, 4, 0.5, "lodging", (0.85, 0.2, 0.85)),
 ]
 
 

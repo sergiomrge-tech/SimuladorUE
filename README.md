@@ -19,7 +19,7 @@ Você começa com um quiosque numa faixa de praia e vai crescendo até um resort
    `Content/Maps/Praia` (o nome `Praia` é o que o `DefaultEngine.ini` espera).
 6. Aperte **Play**. Todo o cenário é montado por código.
 
-Se algo falhar na compilação, copie a mensagem de erro e me mande.
+Se algo falhar na compilação, copie a mensagem de erro e me mande. Há um roteiro de teste em [TESTE.md](TESTE.md).
 
 ## Controles
 

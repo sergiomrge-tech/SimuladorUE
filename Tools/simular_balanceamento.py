@@ -222,7 +222,7 @@ def simulate(days, seed, verbose=False):
                 if d["Tier"] > tier:
                     continue
                 cnt = sum(1 for b in blds if b.d["Id"] == d["Id"])
-                limit = {"hotel": 3, "spa": 1, "restaurant": 2, "pool": 1}.get(d["Id"], 4)
+                limit = {"hotel": 3, "spa": 1, "restaurant": 2, "pool": 1, "gym": 1, "suite": 2, "jet_ski": 2, "massage": 2, "ice_cream": 2}.get(d["Id"], 4)
                 if cnt >= limit:
                     continue
                 gain = d["IncomePerVisit"] * d["Capacity"] / (d["ServiceSeconds"] + TRAVEL) * 3600 / 60 * 0.1

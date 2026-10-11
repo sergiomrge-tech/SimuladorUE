@@ -219,6 +219,116 @@
         0.93,
         0.86
       ]
+    },
+    {
+      "Id": "ice_cream",
+      "DisplayName": "Sorveteria",
+      "Category": "food",
+      "Tier": 2,
+      "Cost": 900,
+      "IncomePerVisit": 11,
+      "ServiceSeconds": 3,
+      "Capacity": 3,
+      "Satisfaction": 0.1,
+      "UpkeepPerDay": 10,
+      "Size": [
+        220,
+        200,
+        230
+      ],
+      "Color": [
+        0.98,
+        0.72,
+        0.8
+      ]
+    },
+    {
+      "Id": "massage",
+      "DisplayName": "Tenda de Massagem",
+      "Category": "wellness",
+      "Tier": 2,
+      "Cost": 1600,
+      "IncomePerVisit": 30,
+      "ServiceSeconds": 14,
+      "Capacity": 2,
+      "Satisfaction": 0.2,
+      "UpkeepPerDay": 14,
+      "Size": [
+        320,
+        300,
+        240
+      ],
+      "Color": [
+        0.9,
+        0.82,
+        0.68
+      ]
+    },
+    {
+      "Id": "jet_ski",
+      "DisplayName": "Aluguel de Jet Ski",
+      "Category": "entertainment",
+      "Tier": 3,
+      "Cost": 3600,
+      "IncomePerVisit": 70,
+      "ServiceSeconds": 22,
+      "Capacity": 4,
+      "Satisfaction": 0.3,
+      "UpkeepPerDay": 22,
+      "Size": [
+        500,
+        350,
+        180
+      ],
+      "Color": [
+        0.95,
+        0.55,
+        0.15
+      ]
+    },
+    {
+      "Id": "gym",
+      "DisplayName": "Academia",
+      "Category": "wellness",
+      "Tier": 4,
+      "Cost": 8000,
+      "IncomePerVisit": 55,
+      "ServiceSeconds": 20,
+      "Capacity": 6,
+      "Satisfaction": 0.25,
+      "UpkeepPerDay": 50,
+      "Size": [
+        800,
+        500,
+        320
+      ],
+      "Color": [
+        0.55,
+        0.6,
+        0.68
+      ]
+    },
+    {
+      "Id": "suite",
+      "DisplayName": "Su\u00edte Presidencial",
+      "Category": "lodging",
+      "Tier": 5,
+      "Cost": 30000,
+      "IncomePerVisit": 600,
+      "ServiceSeconds": 30,
+      "Capacity": 2,
+      "Satisfaction": 0.5,
+      "UpkeepPerDay": 160,
+      "Size": [
+        1000,
+        800,
+        420
+      ],
+      "Color": [
+        0.97,
+        0.94,
+        0.88
+      ]
     }
   ]
 }
