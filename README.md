@@ -80,6 +80,8 @@ Para editar com acentos facilmente, altere `Tools/gerar_dados.py` e rode:
 python Tools/gerar_dados.py
 ```
 
+Guia completo de arte: veja [ASSETS.md](ASSETS.md).
+
 ## Trocar uma forma básica por um modelo 3D final
 
 1. Importe ou adicione o modelo ao projeto (Fab, ou arraste o arquivo no Content Browser).

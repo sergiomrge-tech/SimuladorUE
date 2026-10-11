@@ -1,0 +1,24 @@
+{
+  "buildings": {
+    "kiosk": {
+      "Mesh": "/Game/Fab/Praia/SM_Quiosque.SM_Quiosque",
+      "MeshScale": 1.0,
+      "MeshYaw": 0,
+      "MeshOffset": [0, 0, 0]
+    }
+  },
+  "guests": {
+    "turista": {
+      "Mesh": "/Game/Fab/Pessoas/SK_Turista.SK_Turista",
+      "AnimClass": "/Game/Fab/Pessoas/ABP_Pessoa.ABP_Pessoa_C",
+      "MeshScale": 1.0,
+      "MeshYaw": -90,
+      "MeshOffsetZ": 0
+    }
+  },
+  "staff": {
+    "attendant": { "Mesh": "/Game/Fab/Pessoas/SK_Atendente.SK_Atendente" },
+    "waiter": { "Mesh": "/Game/Fab/Pessoas/SK_Garcom.SK_Garcom" },
+    "cleaner": { "Mesh": "/Game/Fab/Pessoas/SK_Faxineiro.SK_Faxineiro" }
+  }
+}

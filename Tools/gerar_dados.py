@@ -68,6 +68,23 @@ UPGRADES = [
     ("sauna", "Sauna", "wellness", "", 0.45, 0.30, 0.03, 0.15),
 ]
 
+# Arquivo opcional do usuario (nao precisa editar este script): Tools/assets.json.
+# Veja Tools/assets.exemplo.json. Chaves: "buildings", "guests", "staff".
+def _load_user_assets():
+    path = Path(__file__).resolve().parent / "assets.json"
+    if not path.exists():
+        return
+    data = json.loads(path.read_text(encoding="utf-8"))
+    for bid, fields in data.get("buildings", {}).items():
+        MESH_OVERRIDES[bid] = fields
+    for gid, fields in data.get("guests", {}).items():
+        GUEST_MODELS[gid] = fields
+    for role, fields in data.get("staff", {}).items():
+        STAFF_MODELS[role] = fields
+    print(f"assets.json lido: {len(data.get('buildings', {}))} construcoes, "
+          f"{len(data.get('guests', {}))} hospedes, {len(data.get('staff', {}))} funcionarios")
+
+
 GUESTS = [
     # id, nome, nivel minimo, orcamento min, max, velocidade, visitas min, max, peso,
     # categoria preferida, cor da camisa
@@ -80,6 +97,7 @@ GUESTS = [
 
 
 def main():
+    _load_user_assets()
     out_dir = Path(__file__).resolve().parent.parent / "Content" / "Data"
     out_dir.mkdir(parents=True, exist_ok=True)
 
