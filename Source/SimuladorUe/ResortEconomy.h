@@ -71,6 +71,8 @@ public:
 	const TArray<FBuildingDef>& GetBuildingDefs() const { return BuildingDefs; }
 	const TArray<FGuestDef>& GetGuestDefs() const { return GuestDefs; }
 	const FBuildingDef* FindBuildingDef(const FString& Id) const;
+	/** Modelo 3D da funcao ("attendant", "waiter", "cleaner") ou nullptr para usar o boneco provisorio. */
+	const FCharacterModel* FindStaffModel(const FString& Role) const { return StaffModels.Find(Role); }
 	const FUpgradeDef* FindUpgradeDef(const FString& Id) const;
 	/** Melhorias disponiveis para essa construcao (maximo 4). */
 	TArray<const FUpgradeDef*> GetUpgradesFor(const FBuildingDef& Building) const;
@@ -100,6 +102,7 @@ private:
 	TArray<FBuildingDef> BuildingDefs;
 	TArray<FGuestDef> GuestDefs;
 	TArray<FUpgradeDef> UpgradeDefs;
+	TMap<FString, FCharacterModel> StaffModels;
 	TArray<TWeakObjectPtr<ABuildingActor>> Buildings;
 	TArray<FResortNotification> Notifications;
 

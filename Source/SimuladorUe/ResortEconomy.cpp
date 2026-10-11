@@ -13,6 +13,7 @@ void UResortEconomy::Initialize()
 	ResortData::LoadBuildings(BuildingDefs);
 	ResortData::LoadGuests(GuestDefs);
 	ResortData::LoadUpgrades(UpgradeDefs);
+	ResortData::LoadStaffModels(StaffModels);
 
 	Buildings.Reset();
 	Notifications.Reset();

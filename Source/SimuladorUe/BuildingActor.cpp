@@ -100,6 +100,13 @@ void ABuildingActor::SetAttendants(int32 Count)
 		const int32 k = AttendantsShown;
 		const float X = -Def.Size.X * 0.3f + 55.f * k;
 		const float Y = Def.Size.Y * 0.5f + 45.f;
+		const UResortEconomy* Eco = AResortGameMode::GetEconomy(this);
+		const FCharacterModel* Model = Eco != nullptr ? Eco->FindStaffModel(TEXT("attendant")) : nullptr;
+		if (Model != nullptr && ResortVisuals::AddStaticCharacter(this, GetRootComponent(), *Model, FVector(X, Y, 0.f), 180.f))
+		{
+			++AttendantsShown;
+			continue;
+		}
 		Part(TEXT("Cylinder"), FVector(X, Y, 45.f), FVector(28.f, 22.f, 90.f), FLinearColor(0.15f, 0.2f, 0.35f), false);
 		Part(TEXT("Cylinder"), FVector(X, Y, 118.f), FVector(34.f, 26.f, 56.f), Shirts[k % 3], false);
 		Part(TEXT("Sphere"), FVector(X, Y, 160.f), FVector(24.f, 24.f, 26.f), FLinearColor(0.85f, 0.65f, 0.5f), false);

@@ -80,6 +80,25 @@ python Tools/gerar_dados.py
 
 Se o modelo não for encontrado, o jogo volta às formas básicas e avisa no Output Log.
 
+## Trocar os bonecos por pessoas 3D (hóspedes e funcionários)
+
+O jogo já está pronto para receber os modelos; é só apontar para eles em `Tools/gerar_dados.py`
+(`GUEST_MODELS` e `STAFF_MODELS`) e rodar `python Tools/gerar_dados.py`:
+
+- **Mesh:** o SkeletalMesh da pessoa (botão direito > Copy Reference no Content Browser).
+- **AnimClass:** o Animation Blueprint, com `_C` no final (opcional; sem ele o modelo fica parado).
+- **MeshScale / MeshYaw / MeshOffsetZ:** ajustes de tamanho, giro (padrão -90) e altura dos pés.
+- Funções dos funcionários: `attendant` (atendente da loja), `waiter` (garçom), `cleaner` (faxineiro).
+
+Se o modelo não for achado, o jogo usa o boneco básico e avisa no Output Log.
+
+## Mar e areia
+
+O mar tem ondas (cristas que viajam até a praia, espuma que avança e recua, areia molhada que
+acompanha, mar que sobe e desce) e a areia tem manchas de tom, marcas de onda, conchas e pedras.
+Tudo isso é provisório feito por código. Para água e areia de verdade: ative o plugin **Water**
+e use materiais de areia do Fab/Quixel (me mande os caminhos que eu ligo no jogo).
+
 ## Estrutura
 
 ```
@@ -89,6 +108,7 @@ Source/SimuladorUe/
   BuildingActor    uma construção (visual provisório montado por formas básicas)
   GuestCharacter   hóspede (escolhe, anda, usa, paga, vai embora)
   ResortEconomy    dinheiro, prestígio, nível, relógio, lista de construções
+  StaffCharacter   garçom e faxineiro que circulam pela praia
   ResortHUD        interface desenhada no Canvas (sem UMG)
   ResortData       leitura dos JSON em Content/Data
 Content/Data/      Buildings.json, Guests.json

@@ -36,6 +36,17 @@ BUILDINGS = [
 # Se o modelo nao for achado, o jogo usa as formas basicas.
 MESH_OVERRIDES = {}
 
+# Modelos 3D de pessoas (opcional). Aponte para um SkeletalMesh e, se quiser animacao,
+# para o Animation Blueprint (note o "_C" no final). Exemplo:
+#   "attendant": {"Mesh": "/Game/Fab/Pessoas/SK_Atendente.SK_Atendente",
+#                 "AnimClass": "/Game/Fab/Pessoas/ABP_Pessoa.ABP_Pessoa_C",
+#                 "MeshScale": 1.0, "MeshYaw": -90, "MeshOffsetZ": 0},
+# Funcoes: attendant (atendente da loja), waiter (garcom), cleaner (faxineiro).
+STAFF_MODELS = {}
+
+# O mesmo vale para hospedes: GUEST_MODELS["turista"] = {...mesmos campos...}
+GUEST_MODELS = {}
+
 UPGRADES = [
     # id, nome, categoria, construcao (ou "" para toda a categoria), custo (x custo da
     # construcao), bonus de renda, bonus de satisfacao, aumento de manutencao (fracao)
@@ -105,6 +116,7 @@ def main():
             "PreferredCategory": pref,
             "ShirtColor": list(shirt),
         })
+        guests[-1].update(GUEST_MODELS.get(gid, {}))
 
     upgrades = []
     for (uid, name, cat, bid, cf, inc, sat, upk) in UPGRADES:
@@ -115,6 +127,10 @@ def main():
         upgrades.append(u)
     (out_dir / "Upgrades.json").write_text(
         json.dumps({"Upgrades": upgrades}, indent=2) + "\n", encoding="utf-8")
+
+    staff = [dict(Id=role, **fields) for role, fields in STAFF_MODELS.items()]
+    (out_dir / "Staff.json").write_text(
+        json.dumps({"Staff": staff}, indent=2) + "\n", encoding="utf-8")
 
     # ensure_ascii=True (padrao): acentos viram \uXXXX
     (out_dir / "Buildings.json").write_text(

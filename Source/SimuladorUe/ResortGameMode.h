@@ -8,6 +8,7 @@ class AStaticMeshActor;
 class APlayerStart;
 class UDirectionalLightComponent;
 class UResortEconomy;
+class AStaffCharacter;
 
 /**
  * Regras da partida. Como o prototipo nao usa assets de mapa, este GameMode
@@ -44,6 +45,9 @@ private:
 	void SpawnStartingKiosk();
 	void SpawnGuest();
 	void UpdateSun();
+	void BuildSandDetail();
+	void SyncStaff();
+	void UpdateWaves(float DeltaSeconds);
 
 	AStaticMeshActor* SpawnBox(const FVector& Center, const FVector& SizeCm, const FLinearColor& Color,
 		bool bVisible, bool bCollide);
@@ -56,6 +60,22 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<APlayerStart> PlayerStartActor;
+
+	/** Peca do mar que se mexe com as ondas. */
+	struct FWavePart
+	{
+		TWeakObjectPtr<AStaticMeshActor> Actor;
+		FVector Base = FVector::ZeroVector;
+		FVector BaseSize = FVector(100.f);
+		float Phase = 0.f;
+		int32 Kind = 0; // 0 = bobbing, 1 = espuma que vai e volta, 2 = crista que viaja, 3 = areia molhada que avanca
+	};
+	TArray<FWavePart> WaveParts;
+	float WaveTime = 0.f;
+
+	TArray<TWeakObjectPtr<AStaffCharacter>> WaiterActors;
+	TArray<TWeakObjectPtr<AStaffCharacter>> CleanerActors;
+	float StaffSyncTimer = 0.f;
 
 	bool bWorldBuilt = false;
 	int32 LastAutosaveDay = 1;

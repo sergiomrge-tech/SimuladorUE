@@ -50,6 +50,15 @@ namespace
 		return Obj->TryGetStringField(Key, Value) ? Value : DefaultValue;
 	}
 
+	void ReadModel(const TSharedPtr<FJsonObject>& Obj, FCharacterModel& M)
+	{
+		M.Mesh = GetString(Obj, TEXT("Mesh"), TEXT(""));
+		M.AnimClass = GetString(Obj, TEXT("AnimClass"), TEXT(""));
+		M.Scale = GetNumber(Obj, TEXT("MeshScale"), 1.f);
+		M.Yaw = GetNumber(Obj, TEXT("MeshYaw"), -90.f);
+		M.OffsetZ = GetNumber(Obj, TEXT("MeshOffsetZ"), 0.f);
+	}
+
 	bool GetTriple(const TSharedPtr<FJsonObject>& Obj, const FString& Key, float& A, float& B, float& C)
 	{
 		const TArray<TSharedPtr<FJsonValue>>* Arr = nullptr;
@@ -182,6 +191,7 @@ void ResortData::LoadGuests(TArray<FGuestDef>& Out)
 			D.MaxVisits = FMath::Max(D.MinVisits, FMath::RoundToInt(GetNumber(Obj, TEXT("MaxVisits"), 3.f)));
 			D.Weight = FMath::Max(0.01f, GetNumber(Obj, TEXT("Weight"), 1.f));
 			D.PreferredCategory = GetString(Obj, TEXT("PreferredCategory"), TEXT(""));
+			ReadModel(Obj, D.Model);
 
 			float R = 0.2f, G = 0.5f, B = 0.9f;
 			if (GetTriple(Obj, TEXT("ShirtColor"), R, G, B))
@@ -234,5 +244,34 @@ void ResortData::LoadUpgrades(TArray<FUpgradeDef>& Out)
 		U.SatisfactionBonus = GetNumber(Obj, TEXT("SatisfactionBonus"), 0.02f);
 		U.UpkeepFactor = GetNumber(Obj, TEXT("UpkeepFactor"), 0.1f);
 		Out.Add(U);
+	}
+}
+
+void ResortData::LoadStaffModels(TMap<FString, FCharacterModel>& Out)
+{
+	Out.Reset();
+	TArray<TSharedPtr<FJsonValue>> Items;
+	if (!LoadJsonArray(TEXT("Staff.json"), TEXT("Staff"), Items))
+	{
+		return;
+	}
+	for (const TSharedPtr<FJsonValue>& Item : Items)
+	{
+		const TSharedPtr<FJsonObject> Obj = Item.IsValid() ? Item->AsObject() : nullptr;
+		if (!Obj.IsValid())
+		{
+			continue;
+		}
+		const FString Id = GetString(Obj, TEXT("Id"), TEXT(""));
+		if (Id.IsEmpty())
+		{
+			continue;
+		}
+		FCharacterModel M;
+		ReadModel(Obj, M);
+		if (M.IsSet())
+		{
+			Out.Add(Id, M);
+		}
 	}
 }

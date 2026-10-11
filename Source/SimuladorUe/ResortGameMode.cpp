@@ -1,6 +1,7 @@
 #include "ResortGameMode.h"
 #include "BuildingActor.h"
 #include "GuestCharacter.h"
+#include "StaffCharacter.h"
 #include "ResortCharacter.h"
 #include "ResortEconomy.h"
 #include "ResortHUD.h"
@@ -370,13 +371,46 @@ void AResortGameMode::BuildBeach()
 		FLinearColor(0.02f, 0.38f, 0.5f), true, false);
 
 	// Mar em faixas (raso -> fundo) para dar profundidade, e espuma na beira
-	SpawnBox(FVector(SeaEdgeX + 1000.f, 0.f, -13.f), FVector(2000.f, 40000.f, 4.f), FLinearColor(0.15f, 0.7f, 0.7f), true, false);
-	SpawnBox(FVector(SeaEdgeX + 3000.f + 250.f, 0.f, -15.f), FVector(3500.f, 40000.f, 4.f), FLinearColor(0.05f, 0.5f, 0.6f), true, false);
-	SpawnBox(FVector(SeaEdgeX + 40.f, 0.f, -11.f), FVector(80.f, 40000.f, 4.f), FLinearColor(0.95f, 0.98f, 0.98f), true, false);
+	auto AddWave = [this](AStaticMeshActor* Actor, const FVector& Size, float Phase, int32 Kind)
+	{
+		if (Actor != nullptr)
+		{
+			FWavePart P;
+			P.Actor = Actor;
+			P.Base = Actor->GetActorLocation();
+			P.BaseSize = Size;
+			P.Phase = Phase;
+			P.Kind = Kind;
+			WaveParts.Add(P);
+		}
+	};
+	{
+		const FVector ShallowSize(2000.f, 40000.f, 4.f);
+		const FVector DeepSize(3500.f, 40000.f, 4.f);
+		AddWave(SpawnBox(FVector(SeaEdgeX + 1000.f, 0.f, -13.f), ShallowSize, FLinearColor(0.15f, 0.7f, 0.7f), true, false), ShallowSize, 0.f, 0);
+		AddWave(SpawnBox(FVector(SeaEdgeX + 3000.f + 250.f, 0.f, -15.f), DeepSize, FLinearColor(0.05f, 0.5f, 0.6f), true, false), DeepSize, 1.7f, 0);
+
+		// Espuma da beira que avanca e recua
+		const FVector FoamSize(80.f, 40000.f, 4.f);
+		AddWave(SpawnBox(FVector(SeaEdgeX + 40.f, 0.f, -11.f), FoamSize, FLinearColor(0.95f, 0.98f, 0.98f), true, false), FoamSize, 0.f, 1);
+
+		// Cristas de onda que viajam do fundo ate a praia
+		for (int32 i = 0; i < 4; ++i)
+		{
+			const FVector CrestSize(40.f, 40000.f, 6.f);
+			AddWave(SpawnBox(FVector(SeaEdgeX + 800.f, 0.f, -9.f), CrestSize, FLinearColor(0.9f, 0.97f, 0.97f), true, false), CrestSize, i * 2.f, 2);
+		}
+
+		// Areia molhada escura que acompanha a onda subindo na praia
+		const FVector WetSize(100.f, 6000.f, 2.f);
+		AddWave(SpawnBox(FVector(SeaEdgeX - 50.f, 0.f, 1.5f), WetSize, FLinearColor(0.62f, 0.5f, 0.34f), true, false), WetSize, 0.f, 3);
+	}
 
 	// Areia molhada perto da agua e passarela de madeira da entrada ate o quiosque (so visual)
 	SpawnBox(FVector(325.f, 0.f, 1.f), FVector(350.f, 6000.f, 2.f), FLinearColor(0.78f, 0.66f, 0.45f), true, false);
 	SpawnBox(FVector(-1725.f, 0.f, 2.f), FVector(2450.f, 220.f, 4.f), FLinearColor(0.55f, 0.38f, 0.22f), true, false);
+
+	BuildSandDetail();
 
 	// Paredes invisiveis: limitam a area jogavel (3500 x 6000 cm)
 	const float WallHeight = 600.f;
@@ -388,6 +422,151 @@ void AResortGameMode::BuildBeach()
 	SpawnBox(FVector(BackEdgeX - WallThickness * 0.5f, 0.f, WallZ), FVector(WallThickness, SideEdgeY * 2.f + 80.f, WallHeight), FLinearColor::White, false, true);
 	SpawnBox(FVector(CenterX, SideEdgeY + WallThickness * 0.5f, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
 	SpawnBox(FVector(CenterX, -SideEdgeY - WallThickness * 0.5f, WallZ), FVector(LengthX + 80.f, WallThickness, WallHeight), FLinearColor::White, false, true);
+}
+
+void AResortGameMode::BuildSandDetail()
+{
+	// Areia mais "real": manchas de tons diferentes, marcas de onda (ondulacoes), conchas e pedras.
+	FRandomStream Rand(20241011);
+	const FLinearColor Dark(0.84f, 0.7f, 0.48f);
+	const FLinearColor Light(0.98f, 0.88f, 0.67f);
+
+	for (int32 i = 0; i < 140; ++i)
+	{
+		const float X = Rand.FRandRange(BackEdgeX + 100.f, SeaEdgeX - 100.f);
+		const float Y = Rand.FRandRange(-SideEdgeY + 100.f, SideEdgeY - 100.f);
+		const float Z = 0.6f + 0.004f * i;
+		AStaticMeshActor* Patch = SpawnBox(FVector(X, Y, Z),
+			FVector(Rand.FRandRange(150.f, 500.f), Rand.FRandRange(150.f, 500.f), 1.2f),
+			FMath::Lerp(Dark, Light, Rand.FRand()), true, false);
+		if (Patch != nullptr)
+		{
+			Patch->SetActorRotation(FRotator(0.f, Rand.FRandRange(0.f, 180.f), 0.f));
+		}
+	}
+
+	// Ondulacoes paralelas a beira do mar, mais fortes perto da agua
+	for (int32 i = 0; i < 90; ++i)
+	{
+		const float X = Rand.FRandRange(-600.f, SeaEdgeX - 120.f);
+		const float Y = Rand.FRandRange(-SideEdgeY + 200.f, SideEdgeY - 200.f);
+		AStaticMeshActor* Ripple = SpawnBox(FVector(X, Y, 0.9f),
+			FVector(Rand.FRandRange(60.f, 140.f), Rand.FRandRange(250.f, 700.f), 1.f),
+			FLinearColor(0.8f, 0.66f, 0.45f), true, false);
+		if (Ripple != nullptr)
+		{
+			Ripple->SetActorRotation(FRotator(0.f, Rand.FRandRange(-10.f, 10.f), 0.f));
+		}
+	}
+
+	// Conchas pequenas
+	for (int32 i = 0; i < 50; ++i)
+	{
+		const bool bPink = Rand.FRand() > 0.5f;
+		AStaticMeshActor* Shell = SpawnBox(
+			FVector(Rand.FRandRange(-300.f, SeaEdgeX - 60.f), Rand.FRandRange(-SideEdgeY + 100.f, SideEdgeY - 100.f), 1.8f),
+			FVector(Rand.FRandRange(5.f, 9.f), Rand.FRandRange(4.f, 7.f), 3.f),
+			bPink ? FLinearColor(0.95f, 0.7f, 0.68f) : FLinearColor(0.97f, 0.95f, 0.9f), true, false);
+		if (Shell != nullptr)
+		{
+			Shell->SetActorRotation(FRotator(0.f, Rand.FRandRange(0.f, 360.f), 0.f));
+		}
+	}
+
+	// Pedras nas pontas da praia
+	for (int32 i = 0; i < 8; ++i)
+	{
+		const float Side = (i % 2 == 0) ? 1.f : -1.f;
+		const float S = Rand.FRandRange(60.f, 130.f);
+		AStaticMeshActor* Rock = SpawnBox(
+			FVector(Rand.FRandRange(-2600.f, 400.f), Side * Rand.FRandRange(2500.f, 2900.f), S * 0.3f),
+			FVector(S, S * Rand.FRandRange(0.7f, 1.2f), S * 0.6f),
+			FLinearColor(0.38f, 0.37f, 0.36f) * Rand.FRandRange(0.8f, 1.2f), true, false);
+		if (Rock != nullptr)
+		{
+			Rock->SetActorRotation(FRotator(Rand.FRandRange(-8.f, 8.f), Rand.FRandRange(0.f, 360.f), Rand.FRandRange(-8.f, 8.f)));
+		}
+	}
+}
+
+void AResortGameMode::SyncStaff()
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr || Economy == nullptr)
+	{
+		return;
+	}
+
+	auto Sync = [this, World](TArray<TWeakObjectPtr<AStaffCharacter>>& List, int32 Wanted, EStaffRole Role)
+	{
+		List.RemoveAll([](const TWeakObjectPtr<AStaffCharacter>& P) { return !P.IsValid(); });
+		while (List.Num() > Wanted)
+		{
+			if (AStaffCharacter* Extra = List.Last().Get())
+			{
+				Extra->Destroy();
+			}
+			List.Pop();
+		}
+		while (List.Num() < Wanted)
+		{
+			FActorSpawnParameters Params;
+			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AStaffCharacter* Staff = World->SpawnActor<AStaffCharacter>(
+				FVector(-1500.f + FMath::FRandRange(-100.f, 100.f), FMath::FRandRange(-200.f, 200.f), 120.f),
+				FRotator::ZeroRotator, Params);
+			if (Staff == nullptr)
+			{
+				break;
+			}
+			Staff->InitStaff(Role);
+			List.Add(Staff);
+		}
+	};
+	Sync(WaiterActors, Economy->GetWaiters(), EStaffRole::Waiter);
+	Sync(CleanerActors, Economy->GetCleaners(), EStaffRole::Cleaner);
+}
+
+void AResortGameMode::UpdateWaves(float DeltaSeconds)
+{
+	WaveTime += DeltaSeconds;
+	for (const FWavePart& P : WaveParts)
+	{
+		AStaticMeshActor* A = P.Actor.Get();
+		if (A == nullptr)
+		{
+			continue;
+		}
+		FVector Loc = P.Base;
+		FVector Scale(1.f, 1.f, 1.f);
+		switch (P.Kind)
+		{
+		case 0: // mar sobe e desce de leve
+			Loc.Z += 2.f * FMath::Sin(WaveTime * 1.3f + P.Phase);
+			break;
+		case 1: // espuma avanca e recua
+			Loc.X += 70.f * FMath::Sin(WaveTime * 0.9f + P.Phase);
+			break;
+		case 2: // crista viaja do fundo ate a beira e recomeca
+		{
+			const float F = FMath::Frac((WaveTime + P.Phase) / 8.f);
+			Loc.X = SeaEdgeX + 900.f * (1.f - F) + 20.f;
+			Loc.Z += 3.f * FMath::Sin(F * PI);
+			Scale.X = 0.7f + 1.3f * F;
+			Scale.Z = 0.4f + 1.0f * FMath::Sin(F * PI);
+			break;
+		}
+		default: // areia molhada avanca com a espuma
+		{
+			const float Reach = 60.f + 70.f * (0.5f + 0.5f * FMath::Sin(WaveTime * 0.9f + P.Phase));
+			Scale.X = Reach / P.BaseSize.X;
+			Loc.X = SeaEdgeX - Reach * 0.5f;
+			break;
+		}
+		}
+		A->SetActorLocation(Loc);
+		A->SetActorScale3D(FVector(P.BaseSize.X * Scale.X, P.BaseSize.Y * Scale.Y, P.BaseSize.Z * Scale.Z) / 100.0);
+	}
 }
 
 void AResortGameMode::BuildAtmosphere()
@@ -590,6 +769,14 @@ void AResortGameMode::Tick(float DeltaSeconds)
 	}
 
 	Economy->Tick(DeltaSeconds);
+	UpdateWaves(DeltaSeconds);
+
+	StaffSyncTimer -= DeltaSeconds;
+	if (StaffSyncTimer <= 0.f)
+	{
+		StaffSyncTimer = 1.f;
+		SyncStaff();
+	}
 
 	// Salva sozinho a cada novo dia
 	if (Economy->GetDay() != LastAutosaveDay)

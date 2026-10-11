@@ -33,6 +33,9 @@ void AGuestCharacter::InitGuest(const FGuestDef& InDef)
 	Satisfaction = 0.5f;
 	GetCharacterMovement()->MaxWalkSpeed = Def.WalkSpeed * FMath::FRandRange(0.9f, 1.1f);
 
+	// Modelo 3D final (se configurado em Guests.json); senao, boneco provisorio de formas basicas
+	const bool bHasModel = ResortVisuals::ApplyCharacterModel(this, Def.Model);
+
 	// Visual provisorio: pernas, camisa, bracos, cabeca e cabelo
 	static const FLinearColor Skins[4] = {
 		FLinearColor(0.85f, 0.62f, 0.48f), FLinearColor(0.6f, 0.4f, 0.28f),
@@ -45,12 +48,15 @@ void AGuestCharacter::InitGuest(const FGuestDef& InDef)
 
 	const FLinearColor Skin = Skins[FMath::RandRange(0, 3)];
 	USceneComponent* Root = GetCapsuleComponent();
-	ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 0.f, -43.f), FVector(30.f, 30.f, 90.f), FRotator::ZeroRotator, Pants[FMath::RandRange(0, 3)], false);
-	ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 0.f, 32.f), FVector(44.f, 32.f, 60.f), FRotator::ZeroRotator, Def.ShirtColor, false);
-	ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 26.f, 30.f), FVector(10.f, 10.f, 55.f), FRotator::ZeroRotator, Skin, false);
-	ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, -26.f, 30.f), FVector(10.f, 10.f, 55.f), FRotator::ZeroRotator, Skin, false);
-	ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(0.f, 0.f, 74.f), FVector(28.f, 28.f, 30.f), FRotator::ZeroRotator, Skin, false);
-	ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(-1.f, 0.f, 82.f), FVector(27.f, 27.f, 15.f), FRotator::ZeroRotator, Hair[FMath::RandRange(0, 2)], false);
+	if (!bHasModel)
+	{
+		ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 0.f, -43.f), FVector(30.f, 30.f, 90.f), FRotator::ZeroRotator, Pants[FMath::RandRange(0, 3)], false);
+		ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 0.f, 32.f), FVector(44.f, 32.f, 60.f), FRotator::ZeroRotator, Def.ShirtColor, false);
+		ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, 26.f, 30.f), FVector(10.f, 10.f, 55.f), FRotator::ZeroRotator, Skin, false);
+		ResortVisuals::AddPart(this, Root, TEXT("Cylinder"), FVector(0.f, -26.f, 30.f), FVector(10.f, 10.f, 55.f), FRotator::ZeroRotator, Skin, false);
+		ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(0.f, 0.f, 74.f), FVector(28.f, 28.f, 30.f), FRotator::ZeroRotator, Skin, false);
+		ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(-1.f, 0.f, 82.f), FVector(27.f, 27.f, 15.f), FRotator::ZeroRotator, Hair[FMath::RandRange(0, 2)], false);
+	}
 
 	// Indicador de humor sobre a cabeca: verde feliz, amarelo ok, vermelho irritado
 	MoodBall = ResortVisuals::AddPart(this, Root, TEXT("Sphere"), FVector(0.f, 0.f, 110.f), FVector(14.f, 14.f, 14.f), FRotator::ZeroRotator, FLinearColor(0.3f, 0.9f, 0.3f), false);

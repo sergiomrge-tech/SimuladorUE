@@ -70,6 +70,25 @@ struct FUpgradeDef
 	}
 };
 
+/**
+ * Modelo 3D de uma pessoa (hospede ou funcionario). Tudo opcional: se Mesh estiver vazio ou
+ * nao for achado, usa o boneco provisorio de formas basicas.
+ * Mesh: SkeletalMesh (ex.: "/Game/Fab/Pessoas/SK_Homem.SK_Homem")
+ * AnimClass: Animation Blueprint (ex.: "/Game/Fab/Pessoas/ABP_Homem.ABP_Homem_C")
+ */
+struct FCharacterModel
+{
+	FString Mesh;
+	FString AnimClass;
+	float Scale = 1.f;
+	/** Muitos modelos olham para o eixo Y; -90 alinha com a frente do personagem. */
+	float Yaw = -90.f;
+	/** Ajuste de altura (cm) se os pes ficarem enterrados ou flutuando. */
+	float OffsetZ = 0.f;
+
+	bool IsSet() const { return !Mesh.IsEmpty(); }
+};
+
 /** Definicao de um tipo de hospede (carregada de Content/Data/Guests.json). */
 struct FGuestDef
 {
@@ -85,4 +104,5 @@ struct FGuestDef
 	float Weight = 1.f;
 	FString PreferredCategory;
 	FLinearColor ShirtColor = FLinearColor(0.2f, 0.5f, 0.9f);
+	FCharacterModel Model;
 };
